@@ -95,8 +95,8 @@ void DummyRechitDigis::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
   edm::Handle<EcalRecHitCollection> barrelRecHitsHandle;
   edm::Handle<EcalRecHitCollection> endcapRecHitsHandle;
   // dummy collection to Put()
-  std::auto_ptr< EcalRecHitCollection > rechits_temp( new EcalRecHitCollection);
-  std::auto_ptr< EcalRecHitCollection > rechits_temp2( new EcalRecHitCollection);
+  auto rechits_temp = std::make_unique<EcalRecHitCollection>();
+  auto rechits_temp2 = std::make_unique<EcalRecHitCollection>();  
 
   //   EcalRecHit::EcalRecHit(const DetId& id, float energy, float time, uint32_t flags, uint32_t flagBits)
   // add one rechit
@@ -106,16 +106,16 @@ void DummyRechitDigis::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
   *rechits_temp  = zero_collection;
   *rechits_temp2 = zero_collection;
 
-  std::auto_ptr< EcalRecHitCollection > rechits_eb( new EcalRecHitCollection);
-  std::auto_ptr< EcalRecHitCollection > rechits_ee( new EcalRecHitCollection);
+  auto rechits_eb = std::make_unique<EcalRecHitCollection>();
+  auto rechits_ee = std::make_unique<EcalRecHitCollection>();  
 
   // fake digis
   // handle to try to fill
   Handle<EBDigiCollection> digisEBHandle;
   Handle<EEDigiCollection> digisEEHandle;
   // dummy collection to Put()
-  std::auto_ptr<EBDigiCollection> outputEBDigiCollection( new EBDigiCollection );
-  std::auto_ptr<EEDigiCollection> outputEEDigiCollection( new EEDigiCollection );
+  auto outputEBDigiCollection = std::make_unique<EBDigiCollection>();
+  auto outputEEDigiCollection = std::make_unique<EEDigiCollection>();  
 
   //Digi zero_digi;
   EBDigiCollection ebfakecol;
@@ -124,9 +124,9 @@ void DummyRechitDigis::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
   //eefakecol.push_back(zerodigi);
 
   // fake empty collections
-  std::auto_ptr<EBDigiCollection> fakeEBDigiCollection( new EBDigiCollection );
+  auto fakeEBDigiCollection = std::make_unique<EBDigiCollection>();
   *fakeEBDigiCollection = ebfakecol;
-  std::auto_ptr<EEDigiCollection> fakeEEDigiCollection( new EEDigiCollection) ;
+  auto fakeEEDigiCollection = std::make_unique<EEDigiCollection>();
   *fakeEEDigiCollection = eefakecol;
 
   if(!doDigi_) { 
@@ -144,7 +144,7 @@ void DummyRechitDigis::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
     }
     catch(cms::Exception& ex) { foundEBRechit = rechits_eb->size() > 0;}     
     // if you found the collection put it back into the event
-    iEvent.put( foundEBRechit ? rechits_eb : rechits_temp, barrelRecHitCollection_);
+    iEvent.put( foundEBRechit ? std::move(rechits_eb) : std::move(rechits_temp), barrelRecHitCollection_);
      
     // if you dont find the endcap rechits youre looking for, put in a fake one
     try {
@@ -155,7 +155,7 @@ void DummyRechitDigis::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
     catch (cms::Exception& ex){ foundEERechit = rechits_ee->size() > 0;
     } 
 
-    iEvent.put( foundEERechit ? rechits_ee : rechits_temp2, endcapRecHitCollection_);
+    iEvent.put( foundEERechit ? std::move(rechits_ee) : std::move(rechits_temp2), endcapRecHitCollection_);
     std::cout<<"Build fake digi!"<<std::endl;
   } // end dummy rechits
   // Build fake digi collections
@@ -188,7 +188,7 @@ void DummyRechitDigis::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
     }     
 
     // insert the EB collection
-    iEvent.put(foundEBDigi ? outputEBDigiCollection : fakeEBDigiCollection, barrelDigiCollection_);
+    iEvent.put(foundEBDigi ? std::move(outputEBDigiCollection) : std::move(fakeEBDigiCollection), barrelDigiCollection_);
 
     try { // endcap digis
      iEvent.getByLabel(tag_endcapDigiProducer_, digisEEHandle);
@@ -212,7 +212,7 @@ void DummyRechitDigis::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
       //std::cout<<"sono entrato nel catch ee"<<std::endl;
     }
     //     std::cout << "Putting Real EE collection?  " << foundEEDigi <<  std::endl;
-    iEvent.put(foundEEDigi ? outputEEDigiCollection : fakeEEDigiCollection, endcapDigiCollection_);
+    iEvent.put(foundEEDigi ? std::move(outputEEDigiCollection) : std::move(fakeEEDigiCollection), endcapDigiCollection_);
      
   }
   //std::cout << "-----------End Dummy Rechits ---------- " << std::endl;
