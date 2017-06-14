@@ -159,22 +159,24 @@ private:
 	 */
 	///@{
 
-	bool _isSplash; ///< flag to activate for splash analysis
+        bool _isSplash; ///< flag to activate for splash analysis
+        bool _saveTimingEvents; ///< flag to save timing events tree
 	bool _makeEventPlots; ///< flag for making plots for each event (meant for splashes)
 	edm::EDGetTokenT<EcalTimingCollection> _timingEvents; ///< input collection
 	unsigned int _recHitMin; ///< require at least this many rec hits to count the event
 	double _minRecHitEnergyStep; ///< to check step size to check energy stability
 	double _minRecHitEnergyNStep; ///< number of steps to check energy stability
-   double _energyThresholdOffsetEB; ///< energy to add to the minimum energy thresholc
-   double _energyThresholdOffsetEE; ///< energy to add to the minimum energy thresholc
+        double _energyThresholdOffsetEB; ///< energy to add to the minimum energy thresholc
+        double _energyThresholdOffsetEE; ///< energy to add to the minimum energy thresholc
 	unsigned int _minEntries; ///< require a minimum number of entries in a ring to do averages
 	float        _globalOffset;    ///< time to subtract from every event
-   bool _storeEvents;
+        bool _storeEvents;
 	bool _produceNewCalib; ///< true if you don't want to use the values in DB and what to extract new absolute calibrations, if false iteration does not work
 	std::string _outputDumpFileName; ///< name of the output file for the calibration constants' dump
 	float _maxSkewnessForDump;
 /// @}
 
+        void dumpTimingEventToTree(TTree *tree, EcalTimingEvent event, uint32_t rawid_, int ix_, int iy_, int iz_, unsigned int elecID_, int iRing_);
 	void dumpCalibration(std::string filename);
 	void dumpCorrections(std::string filename);
 
@@ -233,8 +235,9 @@ private:
 	edm::Service<TFileService> fileService_;
 	TFileDirectory histDir_;
 	// Tree
-	TTree *dumpTree;
+	TTree * dumpTree;
 	TTree * timingTree;
+        TTree * timingEventsTree;
 	TTree * energyStabilityTree;
 
 	// Mean Histograms
@@ -290,7 +293,7 @@ private:
 	const CaloSubdetectorGeometry * endcapGeometry_;
 	const CaloSubdetectorGeometry * barrelGeometry_;
 
-   const EcalElectronicsMapping * elecMap_;
+        const EcalElectronicsMapping * elecMap_;
 
 	unsigned int _iter;
 };

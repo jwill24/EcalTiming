@@ -323,6 +323,7 @@ if doAnalysis:
 	process.load('EcalTiming.EcalTiming.ecalTimingCalibProducer_cfi')
 	process.timing.timingCollection = cms.InputTag("EcalTimingEvents")
 	process.timing.isSplash= cms.bool(True if options.isSplash else False)
+        process.timing.saveTimingEvents= cms.bool(True)
 	process.timing.makeEventPlots=evtPlots
 	process.timing.globalOffset = cms.double(options.offset)
 	process.timing.outputDumpFile = process.TFileService.fileName

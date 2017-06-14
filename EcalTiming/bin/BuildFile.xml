@@ -1,0 +1,28 @@
+<use name="root"/>
+<use name="rootgraphics"/>
+<use name="FWCore/FWLite"/>
+<use name="FWCore/ParameterSet"/>
+<use name="FWCore/PythonParameterSet"/>
+<use name="FWCore/ServiceRegistry"/>
+<use name="FWCore/Framework"/>
+<use name="FWCore/Utilities"/>
+<use name="PhysicsTools/Utilities"/>
+<use name="CommonTools/UtilAlgos"/>
+<use name="DataFormats/Common"/>
+<use name="DataFormats/EcalRecHit"/>
+<use name="DataFormats/EcalDetId"/>
+<use name="Calibration/Tools"/>
+<use name="Geometry/CaloGeometry"/>
+<use name="Geometry/Records"/>
+<use name="Geometry/EcalMapping"/>
+<use name="CondFormats/DataRecord"/>
+<use name="CondFormats/EcalObjects"/>
+<use name="CondTools/Ecal"/>
+<use name="EcalTiming/EcalTiming"/>
+<flags EDM_PLUGIN="1"/>
+<environment>
+  <bin
+      name="EcalTimingCalibration"
+      file="EcalTimingCalibration.cpp">
+  </bin>
+</environment>

@@ -32,6 +32,7 @@ using namespace cms;
 //
 EcalTimingCalibProducer::EcalTimingCalibProducer(const edm::ParameterSet& iConfig) :
 	_isSplash(iConfig.getParameter<bool>("isSplash")),
+        _saveTimingEvents(iConfig.getParameter<bool>("saveTimingEvents")),
 	_makeEventPlots(iConfig.getParameter<bool>("makeEventPlots")),
 	_timingEvents(consumes<EcalTimingCollection>(iConfig.getParameter<edm::InputTag>("timingCollection"))),
 	_recHitMin(iConfig.getParameter<unsigned int>("recHitMinimumN")),
@@ -80,6 +81,7 @@ void EcalTimingCalibProducer::beginJob()
 
 	// reset the calibration
 	_timeCalibMap.clear();
+       
 }
 
 
@@ -188,9 +190,9 @@ bool EcalTimingCalibProducer::filter(edm::Event& iEvent, const edm::EventSetup& 
            std::cout << timeEvent << std::endl;
 #endif
            if(addRecHit(timeEvent, _eventTimeMap)) {
-              if( timeEvent.detid().subdetId() == EcalBarrel)
+              if( timeEvent.detid().subdetId() == EcalBarrel) {
                  timeEB.add(EcalTimingEvent(timeEvent), false);
-              else {
+              } else {
                  EEDetId id(timeEvent.detid());
                  if(id.zside() < 0) {
                     timeEEM.add(EcalTimingEvent(timeEvent), false);
@@ -233,12 +235,21 @@ bool EcalTimingCalibProducer::filter(edm::Event& iEvent, const edm::EventSetup& 
 	for(auto const & it : _eventTimeMap) {
 		// if it is a splash event, set a global offset shift such that the time is coherent between different events
 		EcalTimingEvent event = _isSplash ? correctGlobalOffset(it.second, splashDir, bunchCorr) : it.second;
-
-		if(_makeEventPlots) plotRecHit(event);
+                
+                unsigned int elecID = getElecID(event.detid());
+                int iRing = _ringTools.getRingIndexInSubdet(event.detid());
+                if( _saveTimingEvents) {
+                    if( event.detid().subdetId() == EcalBarrel) {
+                        EBDetId id(event.detid());
+                        dumpTimingEventToTree(timingEventsTree, event, id.rawId(), id.ieta(), id.iphi(), 0, elecID, iRing);
+                    } else {
+                        EEDetId id(event.detid());
+                        dumpTimingEventToTree(timingEventsTree, event, id.rawId(), id.ix(), id.iy(), id.zside(), elecID, iRing);
+                    }
+                } 
 		_timeCalibMap[it.first].add(event,_storeEvents);
 
 		//Find the CCU(tower) that this crystal belongs to
-		unsigned int elecID = getElecID(it.first);
 		_HWCalibrationMap[elecID].add(event,false);
 
 	}
@@ -254,7 +265,6 @@ void EcalTimingCalibProducer::endJob()
 {
 	std::cout << "EndOfLoop " << std::endl;
 
-
 	// calculate the calibration constants
 
 	// set the values in _calibConstants, _calibErrors, _offsetConstant
@@ -265,7 +275,6 @@ void EcalTimingCalibProducer::endJob()
 		if	(abs(it.second.mean()) > HW_UNIT * 1.5) std::cout <<  "HW: " << it.first << ' ' << it.second.mean() << std::endl;
 	}
 #endif
-
 	// remove the entries OOT (time > n_sigma)
 	float n_sigma = 2.; /// \todo remove hard coded number
 	for(auto calibRecHit_itr = _timeCalibMap.begin(); calibRecHit_itr != _timeCalibMap.end(); ++calibRecHit_itr) {
@@ -558,7 +567,46 @@ void EcalTimingCalibProducer::initTree(TFileDirectory fdir)
 {
 	dumpTree = fdir.make<TTree>("dumpTree", "");
 	timingTree = fdir.make<TTree>("timingTree", "");
+        timingEventsTree = fdir.make<TTree>("timingEventsTree", "");
 	energyStabilityTree = fdir.make<TTree>("energyStabilityTree", "");
+}
+
+void EcalTimingCalibProducer::dumpTimingEventToTree(TTree *tree, EcalTimingEvent event, uint32_t rawid_, int ix_, int iy_, int iz_, unsigned int elecID_, int iRing_) 
+{
+	Float_t  time = event.time();
+	Float_t  energy = event.energy();
+	uint32_t rawid(rawid_);
+	Int_t    ix(ix_);
+ 	Int_t    iy(iy_); 
+	Int_t    iz(iz_);
+	UShort_t elecID(elecID_);
+	Int_t iRing(iRing_);
+
+	if(tree->GetBranch("rawid") == NULL) tree->Branch("rawid", &rawid, "rawid/i");
+	else tree->SetBranchAddress("rawid", &rawid);
+
+	if(tree->GetBranch("ix") == NULL) tree->Branch("ix", &ix, "ix/I");
+	else tree->SetBranchAddress("ix", &ix);
+
+	if(tree->GetBranch("iy") == NULL) tree->Branch("iy", &iy, "iy/I");
+	else tree->SetBranchAddress("iy", &iy);
+
+	if(tree->GetBranch("iz") == NULL) tree->Branch("iz", &iz, "iz/I");
+	else tree->SetBranchAddress("iz", &iz);
+
+	if(tree->GetBranch("time") == NULL) tree->Branch("time", &time, "time/F");
+	else tree->SetBranchAddress("time", &time);
+
+	if(tree->GetBranch("energy") == NULL) tree->Branch("energy", &energy, "energy/F");
+	tree->SetBranchAddress("energy", &energy);
+
+	if(tree->GetBranch("elecID") == NULL) tree->Branch("elecID", &elecID, "elecID/s");
+	else tree->SetBranchAddress("elecID", &elecID);
+
+	if(tree->GetBranch("iRing") == NULL) tree->Branch("iRing", &iRing, "iRing/I");
+	else tree->SetBranchAddress("iRing", &iRing);
+
+	tree->Fill();
 }
 
 //define this as a plug-in
