@@ -40,5 +40,17 @@ EcalTiming
       * JOBdir: directory to store job directories
       * JSONFile: json file
       * GT: gloabl tag
+      
+   * Final step on one unique final file.root: 
+      
+      * EcalTimingCalibration python/EcalTimingCalibration_cfg.py
+      * EcalTimingCalibration_cfg.py options:
+      
+         * inputFile: final file.root
+         * inputTree: tree name, by default "/timing/EcalSplashTiming/timingEventsTree"
+         * outputDir: output directory, by default "$CMSSW_BASE/src/EcalTiming/EcalTiming/output/" 
+         * outputCalib: first calibration output, by default "ecalTiming.dat"
+         * outputCalibCorr: second calibration output, by default "ecalTiming-corr.dat"
+         * outputFile: output file.root with histograms, by default "ecalTiming.root"
    
     
