@@ -5,22 +5,25 @@ process = cms.PSet()
 process.ioFilesOpt = cms.PSet(
 
     ##input file
-    inputFile = cms.string('output/ecalTiming.root'),
+    inputFile = cms.string('root://eoscms.cern.ch//store/user/bmarzocc/ECAL_Timing/Run/298809_v2/ecalTiming.root'),
     
     ##input tree
     inputTree = cms.string('/timing/EcalSplashTiming/timingEventsTree'),
 
-    ## base output directory: default $CMSSW_BASE/src/EcalTiming/EcalTiming/output/
+    ## base output directory: default output/
     outputDir = cms.string(''),
 
     ## base output: default ecalTiming.dat
-    outputCalib = cms.string(''),
+    outputCalib = cms.string('ecalTiming.dat'),
      
     ## base output: default ecalTiming-corr.dat
-    outputCalibCorr = cms.string(''),
+    outputCalibCorr = cms.string('ecalTiming-corr.dat'),
 
     ## base output: default ecalTiming.root
-    outputFile = cms.string('')
+    outputFile = cms.string('ecalTiming.root'),
+
+    ## maxEvents
+    maxEvents = cms.untracked.int32(-1)
 )
 
 process.calibOpt = cms.PSet(

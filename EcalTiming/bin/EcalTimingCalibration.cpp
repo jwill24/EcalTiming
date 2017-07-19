@@ -112,14 +112,16 @@ int main(int argc, char** argv)
    const edm::ParameterSet &calibOpt = process.getParameter<edm::ParameterSet>( "calibOpt" );
 
    string outputDir = filesOpt.getParameter<string>( "outputDir" );
-   if( outputDir == "" ) outputDir = "$CMSSW_BASE/src/EcalTiming/EcalTiming/output/"; 
+   if( outputDir == "" ) outputDir = "output/"; 
+   
    string outputCalib = filesOpt.getParameter<string>( "outputCalib" );
    if( outputCalib == "" ) outputCalib = "ecalTiming.dat"; 
    string outputCalibCorr = filesOpt.getParameter<string>( "outputCalibCorr" );
    if( outputCalibCorr == "" ) outputCalibCorr = "ecalTiming-corr.dat"; 
    string outputFile = filesOpt.getParameter<string>( "outputFile" );
    if( outputFile == "" ) outputFile = "ecalTiming.root"; 
-
+   int maxEvents = filesOpt.getUntrackedParameter<int>( "maxEvents" );
+  
    string inputFile = filesOpt.getParameter<string>( "inputFile" );
    string inputTree = filesOpt.getParameter<string>( "inputTree" );
    TFile* inFile = TFile::Open(inputFile.c_str());
@@ -140,15 +142,35 @@ int main(int argc, char** argv)
    TProfile2D* TimeErrorMapEEM_ = new TProfile2D("TimeErrorMapEEM", "Error Time[ns] profile map EE-;ix;iy; Time[ns]", 100, 1, 101, 100, 1, 101);
 
    TH1F* RechitEneEB_ = new TH1F("RechitEneEB", "RecHit Energy[GeV] EB;Rechit Energy[GeV]; Events", 200, 0.0, 100.0);
-   TH1F* RechitTimeEB_ = new TH1F("RechitTimeEB", "RecHit Mean Time[ns] EB;RecHit Time[ns]; Events", 200, -50.0, 50.0);
+   TH1F* RechitTimeEB_ = new TH1F("RechitTimeEB", "RecHit Mean Time[ns] EB;RecHit Time[ns]; Events", 1000000, -50.0, 50.0);
    TH1F* RechitEneEEM_ = new TH1F("RechitEneEEM", "RecHit Energy[GeV] EE-;Rechit Energy[GeV]; Events", 200, 0.0, 100.0);
-   TH1F* RechitTimeEEM_ = new TH1F("RechitTimeEEM", "RecHit Mean Time[ns] EE-;RecHit Time[ns]; Events", 200, -50.0, 50.0);
+   TH1F* RechitTimeEEM_ = new TH1F("RechitTimeEEM", "RecHit Mean Time[ns] EE-;RecHit Time[ns]; Events", 1000000, -50.0, 50.0);
    TH1F* RechitEneEEP_ = new TH1F("RechitEneEEP", "RecHit Energy[GeV] EE+;Rechit Energy[GeV]; Events", 200, 0.0, 100.0);
-   TH1F* RechitTimeEEP_ = new TH1F("RechitTimeEEP", "RecHit Mean Time[ns] EE+;RecHit Time[ns]; Events", 200, -50.0, 50.0);
+   TH1F* RechitTimeEEP_ = new TH1F("RechitTimeEEP", "RecHit Mean Time[ns] EE+;RecHit Time[ns]; Events", 1000000, -50.0, 50.0);
 
    TProfile2D* HWTimeMapEB_ = new TProfile2D("HWTimeMapEB",  "Mean HW Time[ns] EB profile map; i#phi; i#eta;Time[ns]", 360, 1., 361., 171, -85, 86);
    TProfile2D* HWTimeMapEEM_ = new TProfile2D("HWTimeMapEEM", "Mean HW Time[ns] profile map EE-;ix;iy; Time[ns]", 100, 1, 101, 100, 1, 101);
    TProfile2D* HWTimeMapEEP_ = new TProfile2D("HWTimeMapEEP", "Mean HW Time[ns] profile map EE+;ix;iy; Time[ns]", 100, 1, 101, 100, 1, 101);
+
+   TProfile2D* RingTimeMapEB_ = new TProfile2D("RingTimeMapEB",  "Mean Ring Time[ns] EB profile map; i#phi; i#eta;Time[ns]", 360, 1., 361., 171, -85, 86);
+   TProfile2D* RingTimeMapEEM_ = new TProfile2D("RingTimeMapEEM", "Mean Ring Time[ns] profile map EE-;ix;iy; Time[ns]", 100, 1, 101, 100, 1, 101);
+   TProfile2D* RingTimeMapEEP_ = new TProfile2D("RingTimeMapEEP", "Mean Ring Time[ns] profile map EE+;ix;iy; Time[ns]", 100, 1, 101, 100, 1, 101);
+
+   TH1F* BXTimeEB_ = new TH1F("BXTimeEB",  "Mean BX Time[ns] EB; BX;Time[ns]",3500,0,3500);
+   TH1F* BXTimeEEM_ = new TH1F("BXTimeEEM", "Mean BX Time[ns] EE-;BX; Time[ns]", 3500,0,3500);
+   TH1F* BXTimeEEP_ = new TH1F("BXTimeEEP", "Mean BX Time[ns] EE+;BX; Time[ns]", 3500,0,3500);
+
+   TH1F* BXTimeEB_Num_ = new TH1F("BXTimeEB_Num",  "BX occupancy EB; BX;#Hits",3500,0,3500);
+   TH1F* BXTimeEEM_Num_ = new TH1F("BXTimeEEM_Num", "BX occupancy EE-;BX;#Hits", 3500,0,3500);
+   TH1F* BXTimeEEP_Num_ = new TH1F("BXTimeEEP_Num", "BX occupancy EE+;BX;#Hits", 3500,0,3500);
+
+   TH1F* BXTimeEB_3GeV_ = new TH1F("BXTimeEB_3GeV",  "Mean BX Time[ns] EB; BX;Time[ns]",3500,0,3500);
+   TH1F* BXTimeEB_Num_3GeV_ = new TH1F("BXTimeEB_Num_3GeV",  "BX occupancy EB; BX;#Hits",3500,0,3500);
+   TH1F* BXTimeEB_4GeV_ = new TH1F("BXTimeEB_4GeV",  "Mean BX Time[ns] EB; BX;Time[ns]",3500,0,3500);
+   TH1F* BXTimeEB_Num_4GeV_ = new TH1F("BXTimeEB_Num_4GeV",  "BX occupancy EB; BX;#Hits",3500,0,3500);
+   TH1F* BXTimeEB_5GeV_ = new TH1F("BXTimeEB_5GeV",  "Mean BX Time[ns] EB; BX;Time[ns]",3500,0,3500);
+   TH1F* BXTimeEB_Num_5GeV_ = new TH1F("BXTimeEB_Num_5GeV",  "BX occupancy EB; BX;#Hits",3500,0,3500);
+   
 
    TProfile2D* OccupancyEB_ = new TProfile2D("OccupancyEB", "Occupancy EB; i#phi; i#eta; #Hits", 360, 1., 361., 171, -85, 86);
    TProfile2D* OccupancyEEM_ = new TProfile2D("OccupancyEEM", "OccupancyEEM; iy; ix; #Hits", 100, 1, 101, 100, 1, 101);
@@ -157,15 +179,21 @@ int main(int argc, char** argv)
 
    map< int,map< int, map< int,uint32_t > > > rawIDMap;
    map< int,map< int, map< int,UShort_t > > > elecIDMap;
+   map< int,map< int, map< int,int > > > ringMap;
    map< uint32_t,int > numMap;
    map< uint32_t,float  > sigmaMap;
    map< uint32_t,float > meanEMap;
 
    map< int,map< int, map< int,vector<float> > > > timingEventsMap_time;
    map< int,map< int, map< int,vector<float> > > > timingEventsMap_energy;
+   map< int,map< int, vector<float> > > timingEventBX_time;
    map< int,vector<float> > timingEventsHWMap_time;
    map< int,vector<float> > timingEventsRingMap_time;
 
+   map< int,map< int, vector<float> > > timingEventBX_time_3GeV;
+   map< int,map< int, vector<float> > > timingEventBX_time_4GeV;
+   map< int,map< int, vector<float> > > timingEventBX_time_5GeV;
+ 
    // Declaration of leaf types
    UInt_t        rawid;
    Int_t         ix;
@@ -175,6 +203,10 @@ int main(int argc, char** argv)
    Float_t       energy;
    UShort_t      elecID;
    Int_t         iRing;
+   Int_t         run;
+   Int_t         lumi;
+   Int_t         event;
+   Int_t         bx;
 
    // List of branches
    TBranch        *b_rawid;   //!
@@ -185,6 +217,10 @@ int main(int argc, char** argv)
    TBranch        *b_energy;   //!
    TBranch        *b_elecID;   //!
    TBranch        *b_iRing;   //!
+   TBranch        *b_run;   //!
+   TBranch        *b_lumi;   //!
+   TBranch        *b_event;   //!
+   TBranch        *b_bx;   //!
    
    tree->SetBranchAddress("rawid", &rawid, &b_rawid);
    tree->SetBranchAddress("ix", &ix, &b_ix);
@@ -194,8 +230,21 @@ int main(int argc, char** argv)
    tree->SetBranchAddress("energy", &energy, &b_energy);
    tree->SetBranchAddress("elecID", &elecID, &b_elecID);
    tree->SetBranchAddress("iRing", &iRing, &b_iRing);
+   tree->SetBranchAddress("run", &run, &b_run);
+   tree->SetBranchAddress("lumi", &lumi, &b_lumi);
+   tree->SetBranchAddress("event", &event, &b_event);
+   tree->SetBranchAddress("bx", &bx, &b_bx);
 
-   for(int entry = 0; entry < tree->GetEntries(); entry++){
+   int nEvents = 0;
+
+   if(maxEvents == -1) nEvents = tree->GetEntries();
+   else {
+      if(maxEvents > tree->GetEntries()) nEvents = tree->GetEntries();
+      if(maxEvents < tree->GetEntries()) nEvents = maxEvents;
+   }
+   std::cout << "maxEvents = " << nEvents << std::endl;
+
+   for(int entry = 0; entry < nEvents; entry++){
 
         if(entry%1000000==0) std::cout << "--- Reading entry = " << entry << std::endl;
         tree->GetEntry(entry);
@@ -206,10 +255,16 @@ int main(int argc, char** argv)
 
         rawIDMap[ix][iy][iz] = rawid;
         elecIDMap[ix][iy][iz] = elecID;
+        ringMap[ix][iy][iz] = iRing;
         timingEventsMap_time[ix][iy][iz].push_back(time); 
         timingEventsMap_energy[ix][iy][iz].push_back(energy);
         timingEventsHWMap_time[elecID].push_back(time);
         timingEventsRingMap_time[iRing].push_back(time);
+        timingEventBX_time[bx][iz].push_back(time);
+
+        if(energy > 3.) timingEventBX_time_3GeV[bx][iz].push_back(time);
+        if(energy > 4.) timingEventBX_time_4GeV[bx][iz].push_back(time);
+        if(energy > 5.) timingEventBX_time_5GeV[bx][iz].push_back(time);
 
    }
 
@@ -288,10 +343,93 @@ int main(int argc, char** argv)
 	      } else if(tz.first == 2) {
 		 HWTimeMapEEP_->Fill(ix,iy, untils->mean());
               }
+
+              untils->clear();
+              untils->add(timingEventsRingMap_time[ringMap[tx.first][ty.first][tz.first]]); 
+              
+              if(tz.first == 0) {
+                 RingTimeMapEB_->Fill(iphi,ieta, untils->mean());   
+              } else if(tz.first == 1) {
+	         RingTimeMapEEM_->Fill(ix,iy, untils->mean());
+	      } else if(tz.first == 2) {
+		 RingTimeMapEEP_->Fill(ix,iy, untils->mean());
+              }
                 
           }
-  
-   std::ofstream fout((outputDir+outputCalib).c_str());   
+
+   for(auto tx : timingEventBX_time) 
+      for(auto tz : tx.second) {
+         
+          untils->clear();
+          untils->add(timingEventBX_time[tx.first][tz.first]); 
+          
+          if(untils->num() == 0 || untils->num() == 1) continue; 
+
+          if(tz.first == 0) BXTimeEB_->SetBinContent(BXTimeEB_->FindBin(tx.first),untils->getMeanWithinNSigma(nSigma,maxRange));
+          else if(tz.first == 1) BXTimeEEM_->SetBinContent(BXTimeEEM_->FindBin(tx.first),untils->getMeanWithinNSigma(nSigma,maxRange));
+          else if(tz.first == 2) BXTimeEEP_->SetBinContent(BXTimeEEP_->FindBin(tx.first),untils->getMeanWithinNSigma(nSigma,maxRange));
+
+          if(tz.first == 0) BXTimeEB_->SetBinError(BXTimeEB_->FindBin(tx.first),untils->getMeanErrorWithinNSigma(nSigma,maxRange));
+          else if(tz.first == 1) BXTimeEEM_->SetBinError(BXTimeEEM_->FindBin(tx.first),untils->getMeanErrorWithinNSigma(nSigma,maxRange));
+          else if(tz.first == 2) BXTimeEEP_->SetBinError(BXTimeEEP_->FindBin(tx.first),untils->getMeanErrorWithinNSigma(nSigma,maxRange));
+
+          if(tz.first == 0) BXTimeEB_Num_->SetBinContent(BXTimeEB_Num_->FindBin(tx.first),untils->num());
+          else if(tz.first == 1) BXTimeEEM_Num_->SetBinContent(BXTimeEEM_Num_->FindBin(tx.first),untils->num());
+          else if(tz.first == 2) BXTimeEEP_Num_->SetBinContent(BXTimeEEP_Num_->FindBin(tx.first),untils->num());
+
+      }
+
+   //test different EB energy thresholds 
+
+   for(auto tx : timingEventBX_time_3GeV) 
+      for(auto tz : tx.second) {
+         
+          untils->clear();
+          untils->add(timingEventBX_time_3GeV[tx.first][tz.first]); 
+          
+          if(untils->num() == 0 || untils->num() == 1) continue; 
+
+          if(tz.first == 0) {
+             BXTimeEB_3GeV_->SetBinContent(BXTimeEB_3GeV_->FindBin(tx.first),untils->getMeanWithinNSigma(nSigma,maxRange));
+             BXTimeEB_3GeV_->SetBinError(BXTimeEB_3GeV_->FindBin(tx.first),untils->getMeanErrorWithinNSigma(nSigma,maxRange));
+             BXTimeEB_Num_3GeV_->SetBinContent(BXTimeEB_Num_3GeV_->FindBin(tx.first),untils->num());
+          }
+          
+      }
+
+   for(auto tx : timingEventBX_time_4GeV) 
+      for(auto tz : tx.second) {
+         
+          untils->clear();
+          untils->add(timingEventBX_time_4GeV[tx.first][tz.first]); 
+          
+          if(untils->num() == 0 || untils->num() == 1) continue; 
+
+          if(tz.first == 0) {
+             BXTimeEB_4GeV_->SetBinContent(BXTimeEB_4GeV_->FindBin(tx.first),untils->getMeanWithinNSigma(nSigma,maxRange));
+             BXTimeEB_4GeV_->SetBinError(BXTimeEB_4GeV_->FindBin(tx.first),untils->getMeanErrorWithinNSigma(nSigma,maxRange));
+             BXTimeEB_Num_4GeV_->SetBinContent(BXTimeEB_Num_4GeV_->FindBin(tx.first),untils->num());
+          }
+          
+      }
+
+   for(auto tx : timingEventBX_time_5GeV) 
+      for(auto tz : tx.second) {
+         
+          untils->clear();
+          untils->add(timingEventBX_time_5GeV[tx.first][tz.first]); 
+          
+          if(untils->num() == 0 || untils->num() == 1) continue; 
+
+          if(tz.first == 0) {
+             BXTimeEB_5GeV_->SetBinContent(BXTimeEB_5GeV_->FindBin(tx.first),untils->getMeanWithinNSigma(nSigma,maxRange));
+             BXTimeEB_5GeV_->SetBinError(BXTimeEB_5GeV_->FindBin(tx.first),untils->getMeanErrorWithinNSigma(nSigma,maxRange));
+             BXTimeEB_Num_5GeV_->SetBinContent(BXTimeEB_Num_5GeV_->FindBin(tx.first),untils->num());
+          }
+          
+      }
+
+   std::ofstream fout((outputDir+outputCalib).c_str(), std::ios::out | std::ios::trunc);  
    
    //EB
    for(unsigned int i = 0; i < timeCalibConstants.barrelItems().size(); ++i) {
@@ -306,7 +444,7 @@ int main(int argc, char** argv)
 
    fout.close();
 
-   std::ofstream fout_corr((outputDir+outputCalibCorr).c_str());
+   std::ofstream fout_corr((outputDir+outputCalibCorr).c_str(), std::ios::out | std::ios::trunc);
 
    //EB-
    for(int ieta = -1; ieta>= -85; ieta--)
@@ -376,6 +514,25 @@ int main(int argc, char** argv)
    HWTimeMapEEM_->Write();
    HWTimeMapEEP_->Write();
 
+   RingTimeMapEB_->Write();
+   RingTimeMapEEM_->Write();
+   RingTimeMapEEP_->Write();
+
+   BXTimeEB_->Write();
+   BXTimeEEM_->Write();
+   BXTimeEEP_->Write();
+
+   BXTimeEB_Num_->Write();
+   BXTimeEEM_Num_->Write();
+   BXTimeEEP_Num_->Write();
+
+   BXTimeEB_3GeV_->Write();
+   BXTimeEB_Num_3GeV_->Write();
+   BXTimeEB_4GeV_->Write();
+   BXTimeEB_Num_4GeV_->Write();
+   BXTimeEB_5GeV_->Write();
+   BXTimeEB_Num_5GeV_->Write();
+   
    OccupancyEB_->Write();
    OccupancyEEM_->Write();
    OccupancyEEP_->Write();

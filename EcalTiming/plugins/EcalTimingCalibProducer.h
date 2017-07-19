@@ -176,7 +176,7 @@ private:
 	float _maxSkewnessForDump;
 /// @}
 
-        void dumpTimingEventToTree(TTree *tree, EcalTimingEvent event, uint32_t rawid_, int ix_, int iy_, int iz_, unsigned int elecID_, int iRing_);
+        void dumpTimingEventToTree(TTree *tree, EcalTimingEvent tEvent, uint32_t rawid_, int ix_, int iy_, int iz_, unsigned int elecID_, int iRing_, int run_, int lumi_, int event_, int bx_);
 	void dumpCalibration(std::string filename);
 	void dumpCorrections(std::string filename);
 

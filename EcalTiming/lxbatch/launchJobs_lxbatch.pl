@@ -64,6 +64,8 @@ system("rm fileList.txt") ;
 $LISTOFSamples = "fileList.txt";
 $command = "touch ".$LISTOFSamples ;
 system ($command) ;
+$command = "python ./das_client.py --query='file dataset=".$DATASETName." run=".$RUNNumber."' --limit=0 >> fileList.txt \n" ;
+#print $command ;
 system ("python ./das_client.py --query='file dataset=".$DATASETName." run=".$RUNNumber."' --limit=0 >> fileList.txt \n") ;
   
 open (LISTOFSamples,$LISTOFSamples) ;
@@ -103,9 +105,10 @@ for($jobIt = 1; $jobIt <= $jobNumber; ++$jobIt)
 	system ($command) ;
         $command = "cp  ../test/".$JOBCfgTemplate." ".$jobDir;
 	system ($command) ;
-        $command = "cp  ../".$JSONFile." ".$jobDir;
-	system ($command) ;
- 
+        if($JSONFile ne "0"){
+           $command = "cp  ../".$JSONFile." ".$jobDir;
+	   system ($command) ;
+        }
 	$it = 0;
         $file = 0;
 
@@ -144,17 +147,27 @@ for($jobIt = 1; $jobIt <= $jobNumber; ++$jobIt)
 
 	$command = "setenv SCRAM_ARCH slc6_amd64_gcc530" ;
 	print SAMPLEJOBFILE $command."\n";
-    
+
+        $command = "echo $SCRAM_ARCH" ;
+        print SAMPLEJOBFILE $command."\n";
+
 	$command = "eval `scramv1 ru -csh`" ;
 	print SAMPLEJOBFILE $command."\n";
          
-        $command = "export X509_USER_PROXY=".$X509_USER_PROXY ;
+        $command = "setenv X509_USER_PROXY ".$X509_USER_PROXY ;
 	print SAMPLEJOBFILE $command."\n";
-    
-	$command = "cmsRun ".$JOBCfgTemplate." files=root://cms-xrd-global.cern.ch/".$file." globaltag=".$GT." jsonFile=".$JSONFile." output=".$OUTPUTFILEName."_".$jobIt;
+        
+        if($JSONFile eq "0"){
+	   $command = "cmsRun ".$JOBCfgTemplate." files=root://cms-xrd-global.cern.ch/".$file." globaltag=".$GT." output=".$OUTPUTFILEName."_".$jobIt;
+	   print SAMPLEJOBFILE $command."\n";
+        }else{
+           $command = "cmsRun ".$JOBCfgTemplate." files=root://cms-xrd-global.cern.ch/".$file." globaltag=".$GT." jsonFile=".$JSONFile." output=".$OUTPUTFILEName."_".$jobIt;
+	   print SAMPLEJOBFILE $command."\n";
+        }
+	$command = "eos cp ".$OUTPUTFILEName."_".$jobIt.".root ".$OUTPUTSAVEPath;
 	print SAMPLEJOBFILE $command."\n";
 
-	$command = "/afs/cern.ch/project/eos/installation/0.3.84-aquamarine/bin/eos.select cp ".$OUTPUTFILEName."_".$jobIt.".root ".$OUTPUTSAVEPath;
+        $command = "rm ".$OUTPUTFILEName."_".$jobIt.".root";
 	print SAMPLEJOBFILE $command."\n";
 
 	

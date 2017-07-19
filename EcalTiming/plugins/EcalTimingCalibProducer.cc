@@ -171,6 +171,10 @@ bool EcalTimingCalibProducer::filter(edm::Event& iEvent, const edm::EventSetup& 
         std::cout << "Nhits\t" << timingCollection->size() << std::endl;
 #endif
 
+        int run = iEvent.id().run();
+        int lumi = iEvent.luminosityBlock();
+        int event = iEvent.id().event();
+        int bx = iEvent.bunchCrossing();
 
 	_eventTimeMap.clear(); // reset the map of time from recHits for this event
 
@@ -234,23 +238,23 @@ bool EcalTimingCalibProducer::filter(edm::Event& iEvent, const edm::EventSetup& 
 	// Add adjusted timeEvents to CorrectionsMap
 	for(auto const & it : _eventTimeMap) {
 		// if it is a splash event, set a global offset shift such that the time is coherent between different events
-		EcalTimingEvent event = _isSplash ? correctGlobalOffset(it.second, splashDir, bunchCorr) : it.second;
+		EcalTimingEvent tEvent = _isSplash ? correctGlobalOffset(it.second, splashDir, bunchCorr) : it.second;
                 
-                unsigned int elecID = getElecID(event.detid());
-                int iRing = _ringTools.getRingIndexInSubdet(event.detid());
+                unsigned int elecID = getElecID(tEvent.detid());
+                int iRing = _ringTools.getRingIndexInSubdet(tEvent.detid());
                 if( _saveTimingEvents) {
-                    if( event.detid().subdetId() == EcalBarrel) {
-                        EBDetId id(event.detid());
-                        dumpTimingEventToTree(timingEventsTree, event, id.rawId(), id.ieta(), id.iphi(), 0, elecID, iRing);
+                    if( tEvent.detid().subdetId() == EcalBarrel) {
+                        EBDetId id(tEvent.detid());
+                        dumpTimingEventToTree(timingEventsTree, tEvent, id.rawId(), id.ieta(), id.iphi(), 0, elecID, iRing, run, lumi, event, bx);
                     } else {
-                        EEDetId id(event.detid());
-                        dumpTimingEventToTree(timingEventsTree, event, id.rawId(), id.ix(), id.iy(), id.zside(), elecID, iRing);
+                        EEDetId id(tEvent.detid());
+                        dumpTimingEventToTree(timingEventsTree, tEvent, id.rawId(), id.ix(), id.iy(), id.zside(), elecID, iRing, run, lumi, event, bx);
                     }
                 } 
-		_timeCalibMap[it.first].add(event,_storeEvents);
+		_timeCalibMap[it.first].add(tEvent,_storeEvents);
 
 		//Find the CCU(tower) that this crystal belongs to
-		_HWCalibrationMap[elecID].add(event,false);
+		_HWCalibrationMap[elecID].add(tEvent,false);
 
 	}
 
@@ -571,16 +575,20 @@ void EcalTimingCalibProducer::initTree(TFileDirectory fdir)
 	energyStabilityTree = fdir.make<TTree>("energyStabilityTree", "");
 }
 
-void EcalTimingCalibProducer::dumpTimingEventToTree(TTree *tree, EcalTimingEvent event, uint32_t rawid_, int ix_, int iy_, int iz_, unsigned int elecID_, int iRing_) 
+void EcalTimingCalibProducer::dumpTimingEventToTree(TTree *tree, EcalTimingEvent tEvent, uint32_t rawid_, int ix_, int iy_, int iz_, unsigned int elecID_, int iRing_, int run_, int lumi_, int event_, int bx_) 
 {
-	Float_t  time = event.time();
-	Float_t  energy = event.energy();
+	Float_t  time = tEvent.time();
+	Float_t  energy = tEvent.energy();
 	uint32_t rawid(rawid_);
 	Int_t    ix(ix_);
  	Int_t    iy(iy_); 
 	Int_t    iz(iz_);
 	UShort_t elecID(elecID_);
 	Int_t iRing(iRing_);
+        Int_t run(run_);
+        Int_t lumi(lumi_);
+        Int_t event(event_);
+        Int_t bx(bx_);
 
 	if(tree->GetBranch("rawid") == NULL) tree->Branch("rawid", &rawid, "rawid/i");
 	else tree->SetBranchAddress("rawid", &rawid);
@@ -605,6 +613,19 @@ void EcalTimingCalibProducer::dumpTimingEventToTree(TTree *tree, EcalTimingEvent
 
 	if(tree->GetBranch("iRing") == NULL) tree->Branch("iRing", &iRing, "iRing/I");
 	else tree->SetBranchAddress("iRing", &iRing);
+
+        if(tree->GetBranch("run") == NULL) tree->Branch("run", &run, "run/I");
+	else tree->SetBranchAddress("run", &run);
+
+        if(tree->GetBranch("lumi") == NULL) tree->Branch("lumi", &lumi, "lumi/I");
+	else tree->SetBranchAddress("lumi", &lumi);
+
+        if(tree->GetBranch("event") == NULL) tree->Branch("event", &event, "event/I");
+	else tree->SetBranchAddress("event", &event);
+
+        if(tree->GetBranch("bx") == NULL) tree->Branch("bx", &bx, "bx/I");
+	else tree->SetBranchAddress("bx", &bx);
+
 
 	tree->Fill();
 }
