@@ -7,10 +7,17 @@ EcalTiming
     * cd CMSSW_9_0_0
     * cmsenv
     * git cms-merge-topic previsualconsent:iRingSubdet804
+    * git cms-addpkg CondTools/Ecal
     * git clone  git@github.com:bmarzocc/EcalTiming.git
     * cd EcalTiming
     * git checkout Run2017
     * cd -
+    * cp EcalTiming/EcalTiming/interface/EcalFloatCondObjectContainerXMLTranslator.h CondTools/Ecal/interface/
+    * rm EcalTiming/EcalTiming/interface/EcalFloatCondObjectContainerXMLTranslator.h
+    * cp EcalTiming/EcalTiming/src/EcalFloatCondObjectContainerXMLTranslator.cc CondTools/Ecal/src/
+    * rm EcalTiming/EcalTiming/src/EcalFloatCondObjectContainerXMLTranslator.cc
+    * cp EcalTiming/EcalTiming/test/testEcalTimeCalib.py CondTools/Ecal/python/
+    * rm EcalTiming/EcalTiming/test/testEcalTimeCalib.py
     * scram b -j 5
 
 2) Run:
@@ -52,5 +59,18 @@ EcalTiming
          * outputCalib: first calibration output, by default "ecalTiming.dat"
          * outputCalibCorr: second calibration output, by default "ecalTiming-corr.dat"
          * outputFile: output file.root with histograms, by default "ecalTiming.root"
+
+4) Produce the sql tag file:
+
+   * Produce the absolute time calibration (xml file) from the latest IOV:
    
+     * python test/makeTimeCalibConstantsTag_step1.py --tag EcalTimeCalibConstants_v08_offline --calib output/ecalTiming-corr.dat --output EcalTimeCalibConstants_IOV.xml
+     
+   * Produce the sqlite file from EcalTimeCalibConstants_IOV.xml (change the xml input in testEcalTimeCalib.py):
+     
+     * cd -
+     * cd CondTools/Ecal/python/
+     * cmsRun testEcalTimeCalib.py 
+    
+
     
