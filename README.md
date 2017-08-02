@@ -22,6 +22,8 @@ EcalTiming
 
 2) Run:
 
+    * cd -
+    * cd EcalTiming/EcalTiming/
     * cmsRun test/ecalTime_fromAlcaStream_cfg.py files=root://cms-xrd-global.cern.ch//store/data/Commissioning2017/AlCaPhiSym/RAW/v1/000/293/910/00000/181C8C47-8237-E711-9089-02163E0118FF.root globaltag=90X_dataRun2_HLT_v2
     * NOTE: the outputs are produced in one step and CANNOT BE MERGED with other outputs.
     
@@ -29,8 +31,9 @@ EcalTiming
 
    * launch:
    
+      * cd -
+      * cd EcalTiming/EcalTiming/lxbatch/
       * voms-proxy-init --voms cms --valid 168:00
-      * cd lxbatch
       * perl launchJobs_lxbatch.pl params_lxbatch.CFG
       * sh lancia.sh
       
@@ -50,6 +53,8 @@ EcalTiming
       
    * Final step on one unique final file.root: 
       
+      * cd -
+      * cd EcalTiming/EcalTiming/
       * EcalTimingCalibration python/EcalTimingCalibration_cfg.py
       * EcalTimingCalibration_cfg.py options:
       
@@ -63,8 +68,10 @@ EcalTiming
 4) Produce the sql tag file:
 
    * Produce the absolute time calibration (xml file) from the latest IOV:
-   
-     * python test/makeTimeCalibConstantsTag_step1.py --tag EcalTimeCalibConstants_v08_offline --calib output/ecalTiming-corr.dat --output EcalTimeCalibConstants_IOV.xml
+     
+     * cd -
+     * cd EcalTiming/EcalTiming/test/
+     * python makeTimeCalibConstantsTag_step1.py --tag EcalTimeCalibConstants_v08_offline --calib ../output/ecalTiming-corr.dat --output EcalTimeCalibConstants_IOV.xml
      
    * Produce the sqlite file from EcalTimeCalibConstants_IOV.xml (change the xml input in testEcalTimeCalib.py):
      
