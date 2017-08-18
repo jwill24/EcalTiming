@@ -7,7 +7,7 @@ def usage():
     print "Usage: python makeTimeCalibConstantsTag_step1.py --tag=[tag] --calib=[calib] --output=[output]"
     
 try:
-     opts, args = getopt.getopt(sys.argv[1:], "m:d:r:g:so:", ["tag=","calib=","output="])
+     opts, args = getopt.getopt(sys.argv[1:], "t:c:o:", ["tag=","calib=","output="])
 
 except getopt.GetoptError:
      #* print help information and exit:*
