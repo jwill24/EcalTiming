@@ -179,4 +179,4 @@ for($jobIt = 1; $jobIt <= $jobNumber; ++$jobIt)
 	print SAMPLEJOBLISTFILE $command."\n";
 }  
 
-#system("rm fileList.txt") ;
+system("rm fileList.txt") ;
