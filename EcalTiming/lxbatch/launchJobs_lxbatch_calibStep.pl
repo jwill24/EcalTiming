@@ -78,18 +78,21 @@ $command = "eval `scramv1 ru -csh`" ;
 print SAMPLEJOBFILE $command."\n";
 
 $command = "EcalTimingCalibration EcalTimingCalibration_cfg.py" ;
+print SAMPLEJOBFILE $command."\n";  
+
+$command = "eos mkdir ".$OUTPUTSAVEPath;
 print SAMPLEJOBFILE $command."\n";         
         
 $command = "cd output" ;
 print SAMPLEJOBFILE $command."\n";
 
-$command = "eos cp ecalTiming.dat ".$OUTPUTSAVEPath;
+$command = "eos cp ecalTiming.dat root://eoscms.cern.ch/".$OUTPUTSAVEPath;
 print SAMPLEJOBFILE $command."\n";
 
-$command = "eos cp ecalTiming-corr.dat ".$OUTPUTSAVEPath;
+$command = "eos cp ecalTiming-corr.dat root://eoscms.cern.ch/".$OUTPUTSAVEPath;
 print SAMPLEJOBFILE $command."\n";
 
-$command = "eos cp ecalTiming.root ".$OUTPUTSAVEPath;
+$command = "eos cp ecalTiming.root root://eoscms.cern.ch/".$OUTPUTSAVEPath;
 print SAMPLEJOBFILE $command."\n";
 	
 ############

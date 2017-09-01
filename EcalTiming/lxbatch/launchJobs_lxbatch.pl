@@ -31,7 +31,6 @@ $RUNNumber        = $User_Preferences{"RUNNumber"} ;
 $OUTPUTSAVEPath   = $User_Preferences{"OUTPUTSAVEPath"} ;
 $OUTPUTFILEName   = $User_Preferences{"OUTPUTFILEName"} ;
 $QUEUE            = $User_Preferences{"QUEUE"};
-$JOBdir           = $User_Preferences{"JOBdir"};
 $JSONFile         = $User_Preferences{"JSONFile"};
 $GT               = $User_Preferences{"GT"};
 
@@ -44,7 +43,6 @@ print "RUNNUmber = "        .$RUNNumber."\n" ;
 print "OUTPUTSAVEPath = "   .$OUTPUTSAVEPath."\n" ;
 print "OUTPUTFILEName = "   .$OUTPUTFILEName."\n" ;
 print "QUEUE  = "           .$QUEUE."\n" ;
-print "JOBdir  = "          .$JOBdir."\n" ;
 print "JSONFile  = "        .$JSONFile."\n" ;
 print "GT  = "              .$GT."\n" ;
 
@@ -60,7 +58,8 @@ open(SAMPLEJOBLISTFILE, ">", $sampleJobListFile);
 $totNumber = 0;
 $jobNumber = 0;
 
-system("rm fileList.txt") ;
+$JOBdir = $RUNNumber;
+
 $LISTOFSamples = "fileList.txt";
 $command = "touch ".$LISTOFSamples ;
 system ($command) ;
@@ -164,7 +163,11 @@ for($jobIt = 1; $jobIt <= $jobNumber; ++$jobIt)
            $command = "cmsRun ".$JOBCfgTemplate." files=root://cms-xrd-global.cern.ch/".$file." globaltag=".$GT." jsonFile=".$JSONFile." output=".$OUTPUTFILEName."_".$jobIt;
 	   print SAMPLEJOBFILE $command."\n";
         }
-	$command = "eos cp ".$OUTPUTFILEName."_".$jobIt.".root ".$OUTPUTSAVEPath;
+        
+        $command = "eos mkdir ".$OUTPUTSAVEPath."/".$JOBdir;
+	print SAMPLEJOBFILE $command."\n";
+
+	$command = "eos cp ".$OUTPUTFILEName."_".$jobIt.".root root://eoscms.cern.ch/".$OUTPUTSAVEPath."/".$JOBdir."/";
 	print SAMPLEJOBFILE $command."\n";
 
         $command = "rm ".$OUTPUTFILEName."_".$jobIt.".root";
