@@ -64,6 +64,7 @@
 #include "TH2F.h"
 #include "TFile.h"
 #include "TProfile2D.h"
+#include "TChain.h"
 
 #include <fstream>
 #include <string>
@@ -122,10 +123,15 @@ int main(int argc, char** argv)
    if( outputFile == "" ) outputFile = "ecalTiming.root"; 
    int maxEvents = filesOpt.getUntrackedParameter<int>( "maxEvents" );
   
-   string inputFile = filesOpt.getParameter<string>( "inputFile" );
+   vector<string> inputFile = filesOpt.getParameter< vector<string> >( "inputFile" );
    string inputTree = filesOpt.getParameter<string>( "inputTree" );
-   TFile* inFile = TFile::Open(inputFile.c_str());
-   TTree* tree = (TTree*)inFile->Get(inputTree.c_str());
+
+   TChain* tree = new TChain(inputTree.c_str());
+   for(unsigned int ifile = 0; ifile< inputFile.size(); ifile++)
+   {
+       std::cout << "---> " << ifile+1 << " - Input file = " << inputFile.at(ifile) << std::endl;
+       tree->Add(inputFile.at(ifile).c_str());
+   }
 
    int nSigma = calibOpt.getParameter<int>( "nSigma" );
    int maxRange = calibOpt.getParameter<int>( "maxRange" );

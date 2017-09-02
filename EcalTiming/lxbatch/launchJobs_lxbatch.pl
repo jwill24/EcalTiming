@@ -46,6 +46,7 @@ print "QUEUE  = "           .$QUEUE."\n" ;
 print "JSONFile  = "        .$JSONFile."\n" ;
 print "GT  = "              .$GT."\n" ;
 
+system("rm fileList.txt") ;
 
 $sampleJobListFile = "./lancia.sh";
 open(SAMPLEJOBLISTFILE, ">", $sampleJobListFile);
