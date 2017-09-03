@@ -5,7 +5,7 @@ process = cms.PSet()
 process.ioFilesOpt = cms.PSet(
 
     ##input file
-    inputFile = cms.string('root://eoscms.cern.ch//store/user/bmarzocc/ECAL_Timing/Run/298809_v2/ecalTiming.root'),
+    inputFile = cms.string('root://eoscms.cern.ch//store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2017B/297046/ecalTiming_1.root,root://eoscms.cern.ch//store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2017B/297046/ecalTiming_2.root'),
     
     ##input tree
     inputTree = cms.string('/timing/EcalSplashTiming/timingEventsTree'),
