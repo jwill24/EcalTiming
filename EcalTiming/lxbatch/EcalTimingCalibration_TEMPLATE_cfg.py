@@ -5,7 +5,7 @@ process = cms.PSet()
 process.ioFilesOpt = cms.PSet(
 
     ##input file
-    inputFile = cms.vstring(LISTOFFILES),
+    inputFile = cms.string('LISTOFFILES'),
     
     ##input tree
     inputTree = cms.string('/timing/EcalSplashTiming/timingEventsTree'),
