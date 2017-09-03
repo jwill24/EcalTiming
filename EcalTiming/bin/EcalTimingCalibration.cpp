@@ -92,6 +92,17 @@
 
 using namespace std;
 
+vector<string> split(const string &text, char sep) {
+  vector<string> tokens;
+  size_t start = 0, end = 0;
+  while ((end = text.find(sep, start)) != string::npos) {
+    tokens.push_back(text.substr(start, end - start));
+    start = end + 1;
+  }
+  tokens.push_back(text.substr(start));
+  return tokens;
+}
+
 int main(int argc, char** argv)
 {
 
@@ -123,13 +134,15 @@ int main(int argc, char** argv)
    if( outputFile == "" ) outputFile = "ecalTiming.root"; 
    int maxEvents = filesOpt.getUntrackedParameter<int>( "maxEvents" );
   
-   vector<string> inputFile = filesOpt.getParameter< vector<string> >( "inputFile" );
+   string inputFiles = filesOpt.getParameter<string>( "inputFile" );
    string inputTree = filesOpt.getParameter<string>( "inputTree" );
 
+   vector<string> inputFile = split(inputFiles,',');
+   
    TChain* tree = new TChain(inputTree.c_str());
    for(unsigned int ifile = 0; ifile< inputFile.size(); ifile++)
    {
-       std::cout << "---> " << ifile+1 << " - Input file = " << inputFile.at(ifile) << std::endl;
+       cout << "---> " << ifile+1 << " - Input file = " << inputFile.at(ifile) << endl;
        tree->Add(inputFile.at(ifile).c_str());
    }
 
@@ -199,6 +212,21 @@ int main(int argc, char** argv)
    map< int,map< int, vector<float> > > timingEventBX_time_3GeV;
    map< int,map< int, vector<float> > > timingEventBX_time_4GeV;
    map< int,map< int, vector<float> > > timingEventBX_time_5GeV;
+
+   rawIDMap.clear();
+   elecIDMap.clear();
+   ringMap.clear();
+   numMap.clear();
+   sigmaMap.clear();
+   meanEMap.clear();
+   timingEventsMap_time.clear();
+   timingEventsMap_energy.clear();
+   timingEventBX_time.clear();
+   timingEventsHWMap_time.clear();
+   timingEventsRingMap_time.clear();
+   timingEventBX_time_3GeV.clear();
+   timingEventBX_time_4GeV.clear();
+   timingEventBX_time_5GeV.clear();
  
    // Declaration of leaf types
    UInt_t        rawid;
@@ -248,11 +276,11 @@ int main(int argc, char** argv)
       if(maxEvents > tree->GetEntries()) nEvents = tree->GetEntries();
       if(maxEvents < tree->GetEntries()) nEvents = maxEvents;
    }
-   std::cout << "maxEvents = " << nEvents << std::endl;
+   cout << "maxEvents = " << nEvents << endl;
 
    for(int entry = 0; entry < nEvents; entry++){
 
-        if(entry%1000000==0) std::cout << "--- Reading entry = " << entry << std::endl;
+        if(entry%1000000==0) cout << "--- Reading entry = " << entry << endl;
         tree->GetEntry(entry);
 
         if(iz == 0) ix += 85;
@@ -369,7 +397,7 @@ int main(int argc, char** argv)
           untils->clear();
           untils->add(timingEventBX_time[tx.first][tz.first]); 
           
-          if(untils->num() == 0 || untils->num() == 1) continue; 
+          if(untils->num() == 0) continue; 
 
           if(tz.first == 0) BXTimeEB_->SetBinContent(BXTimeEB_->FindBin(tx.first),untils->getMeanWithinNSigma(nSigma,maxRange));
           else if(tz.first == 1) BXTimeEEM_->SetBinContent(BXTimeEEM_->FindBin(tx.first),untils->getMeanWithinNSigma(nSigma,maxRange));
@@ -393,7 +421,7 @@ int main(int argc, char** argv)
           untils->clear();
           untils->add(timingEventBX_time_3GeV[tx.first][tz.first]); 
           
-          if(untils->num() == 0 || untils->num() == 1) continue; 
+          if(untils->num() == 0) continue; 
 
           if(tz.first == 0) {
              BXTimeEB_3GeV_->SetBinContent(BXTimeEB_3GeV_->FindBin(tx.first),untils->getMeanWithinNSigma(nSigma,maxRange));
@@ -409,7 +437,7 @@ int main(int argc, char** argv)
           untils->clear();
           untils->add(timingEventBX_time_4GeV[tx.first][tz.first]); 
           
-          if(untils->num() == 0 || untils->num() == 1) continue; 
+          if(untils->num() == 0) continue; 
 
           if(tz.first == 0) {
              BXTimeEB_4GeV_->SetBinContent(BXTimeEB_4GeV_->FindBin(tx.first),untils->getMeanWithinNSigma(nSigma,maxRange));
@@ -425,7 +453,7 @@ int main(int argc, char** argv)
           untils->clear();
           untils->add(timingEventBX_time_5GeV[tx.first][tz.first]); 
           
-          if(untils->num() == 0 || untils->num() == 1) continue; 
+          if(untils->num() == 0) continue; 
 
           if(tz.first == 0) {
              BXTimeEB_5GeV_->SetBinContent(BXTimeEB_5GeV_->FindBin(tx.first),untils->getMeanWithinNSigma(nSigma,maxRange));
@@ -435,22 +463,22 @@ int main(int argc, char** argv)
           
       }
 
-   std::ofstream fout((outputDir+outputCalib).c_str(), std::ios::out | std::ios::trunc);  
+   ofstream fout((outputDir+outputCalib).c_str(), ios::out | ios::trunc);  
    
    //EB
    for(unsigned int i = 0; i < timeCalibConstants.barrelItems().size(); ++i) {
         EBDetId id(EBDetId::detIdFromDenseIndex(i)); 
-	fout << id.ieta() << "\t" << id.iphi() << "\t" << 0 << "\t" << timeCalibConstants.barrelItems()[i] << "\t" << id.rawId() << std::endl;
+	fout << id.ieta() << "\t" << id.iphi() << "\t" << 0 << "\t" << timeCalibConstants.barrelItems()[i] << "\t" << id.rawId() << endl;
    }
    //EE
    for(unsigned int i = 0; i < timeCalibConstants.endcapItems().size(); ++i) {
         EEDetId id(EEDetId::detIdFromDenseIndex(i)); 
-	fout << id.ix() << "\t" << id.iy() << "\t" << id.zside() << "\t" << timeCalibConstants.endcapItems()[i] << "\t" << id.rawId() << std::endl;
+	fout << id.ix() << "\t" << id.iy() << "\t" << id.zside() << "\t" << timeCalibConstants.endcapItems()[i] << "\t" << id.rawId() << endl;
    }
 
    fout.close();
 
-   std::ofstream fout_corr((outputDir+outputCalibCorr).c_str(), std::ios::out | std::ios::trunc);
+   ofstream fout_corr((outputDir+outputCalibCorr).c_str(), ios::out | ios::trunc);
 
    //EB-
    for(int ieta = -1; ieta>= -85; ieta--)
@@ -459,7 +487,7 @@ int main(int argc, char** argv)
           untils->add(timingEventsMap_time[ieta+85][iphi][0]); 
 	  if(numMap[rawIDMap[ieta+85][iphi][0]] != 0) fout_corr << ieta << "\t" << iphi << "\t" << 0
 			     << "\t" << untils->getMeanWithinNSigma(nSigma,maxRange) << "\t" << sigmaMap[rawIDMap[ieta+85][iphi][0]] << "\t" << numMap[rawIDMap[ieta+85][iphi][0]] << "\t" << meanEMap[rawIDMap[ieta+85][iphi][0]]
-			     << "\t" << rawIDMap[ieta+85][iphi][0] << std::endl;
+			     << "\t" << rawIDMap[ieta+85][iphi][0] << endl;
 	
       }
    //EB+
@@ -469,7 +497,7 @@ int main(int argc, char** argv)
           untils->add(timingEventsMap_time[ieta+85][iphi][0]); 
 	  if(numMap[rawIDMap[ieta+85][iphi][0]] != 0) fout_corr << ieta << "\t" << iphi << "\t" << 0
 			     << "\t" << untils->getMeanWithinNSigma(nSigma,maxRange) << "\t" << sigmaMap[rawIDMap[ieta+85][iphi][0]] << "\t" << numMap[rawIDMap[ieta+85][iphi][0]] << "\t" << meanEMap[rawIDMap[ieta+85][iphi][0]]
-			     << "\t" << rawIDMap[ieta+85][iphi][0] << std::endl;
+			     << "\t" << rawIDMap[ieta+85][iphi][0] << endl;
 	
       }
    //EE-
@@ -479,7 +507,7 @@ int main(int argc, char** argv)
           untils->add(timingEventsMap_time[ix][iy][1]); 
 	  if(numMap[rawIDMap[ix][iy][1]] != 0) fout_corr << ix << "\t" << iy << "\t" << -1
 			     << "\t" << untils->getMeanWithinNSigma(nSigma,maxRange) << "\t" << sigmaMap[rawIDMap[ix][iy][1]] << "\t" << numMap[rawIDMap[ix][iy][1]] << "\t" << meanEMap[rawIDMap[ix][iy][1]]
-			     << "\t" << rawIDMap[ix][iy][1] << std::endl;
+			     << "\t" << rawIDMap[ix][iy][1] << endl;
 	
       }
    //EE+
@@ -489,7 +517,7 @@ int main(int argc, char** argv)
           untils->add(timingEventsMap_time[ix][iy][2]); 
 	  if(numMap[rawIDMap[ix][iy][2]] != 0) fout_corr << ix << "\t" << iy << "\t" << 1
 			     << "\t" << untils->getMeanWithinNSigma(nSigma,maxRange) << "\t" << sigmaMap[rawIDMap[ix][iy][2]] << "\t" << numMap[rawIDMap[ix][iy][2]] << "\t" << meanEMap[rawIDMap[ix][iy][2]]
-			     << "\t" << rawIDMap[ix][iy][2] << std::endl;
+			     << "\t" << rawIDMap[ix][iy][2] << endl;
 	
       }
 
@@ -545,3 +573,4 @@ int main(int argc, char** argv)
 
    file->Close();
 }
+

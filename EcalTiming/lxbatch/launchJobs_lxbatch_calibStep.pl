@@ -29,7 +29,6 @@ $INPUTRuns        = $User_Preferences{"INPUTRuns"};
 $JOBCfgTemplate   = $User_Preferences{"JOBCfgTemplate"} ;
 $OUTPUTSAVEPath   = $User_Preferences{"OUTPUTSAVEPath"} ;
 $QUEUE            = $User_Preferences{"QUEUE"};
-$JOBdir           = $User_Preferences{"JOBdir"};
 
 print "BASEDir = "          .$BASEDir."\n" ;
 print "INPUTDir = "         .$INPUTDir."\n" ;
@@ -37,7 +36,6 @@ print "INPUTRuns = "        .$INPUTRuns."\n" ;
 print "JOBCfgTemplate = "   .$JOBCfgTemplate."\n" ;
 print "OUTPUTSAVEPath = "   .$OUTPUTSAVEPath."\n" ;
 print "QUEUE  = "           .$QUEUE."\n" ;
-print "JOBdir  = "          .$JOBdir."\n" ;
 
 $command = "rm list_files_tmp.txt" ; 
 system ($command) ;
@@ -45,10 +43,13 @@ system ($command) ;
 $sampleJobListFile = "./lancia.sh";
 open(SAMPLEJOBLISTFILE, ">", $sampleJobListFile);
 
-system ("mkdir ".$JOBdir." \n") ;
-
 $currDir = `pwd` ;
 chomp ($currDir) ;
+
+$JOBdir = $INPUTRuns."_Calib";
+$JOBdir =~ s/,/_/g ;
+
+system ("mkdir ".$JOBdir." \n") ;
 
 $jobDir = $currDir."/".$JOBdir ;   
 $tempBjob = $jobDir."/bjob.sh" ;
@@ -74,27 +75,26 @@ while (<LISTOFFiles>)
     $remove = "/eos/cms";
     $file  =~ s/$remove// ;
     
-    $JOBLISTOFFiles = $JOBLISTOFFiles."APICE"."root://eoscms.cern.ch/".$file."APICE,";
+    $JOBLISTOFFiles = $JOBLISTOFFiles."root://eoscms.cern.ch/".$file.",";
 }
 
-$tempo1 = "./tempo1" ;   
-system ("cat ".$JOBCfgTemplate." | sed -e s%LISTOFFILES%".$JOBLISTOFFiles."%g > ".$tempo1) ;
+chop $JOBLISTOFFiles;
 
-$tempo2 = "./EcalTimingCalibration_cfg.py" ;
-system ("cat ".$tempo1." | sed -e s%APICE%\\'%g > ".$tempo2) ;
+$tempo1 = "./EcalTimingCalibration_cfg.py" ;   
+system ("cat ".$JOBCfgTemplate." | sed -e s%LISTOFFILES%".$JOBLISTOFFiles."%g > ".$tempo1) ;
 
 $command = "touch ".$tempBjob ;
 system ($command) ;
 $command = "chmod 777 ".$tempBjob ;
 system ($command) ;
-$command = "cp ".$tempo2." ".$jobDir;
+$command = "cp ".$tempo1." ".$jobDir;
 system ($command) ;
 
 $command = "mkdir ".$jobDir."/output";
 system ($command) ;
 
 $OUTDir = $OUTPUTSAVEPath."/".$INPUTRuns;
-$OUTDir =~ s/,/_/ ;
+$OUTDir =~ s/,/_/g ;
 
 ######################
 # make job files
@@ -145,6 +145,4 @@ print SAMPLEJOBLISTFILE $command."\n";
 $command = "rm list_files_tmp.txt" ; 
 system ($command) ;
 $command = "rm ".$tempo1 ; 
-system ($command) ;
-$command = "rm ".$tempo2 ; 
 system ($command) ;
