@@ -27,7 +27,7 @@ $BASEDir          = $User_Preferences{"BASEDir"};
 $X509_USER_PROXY  = $User_Preferences{"X509_USER_PROXY"};
 $JOBCfgTemplate   = $User_Preferences{"JOBCfgTemplate"} ;
 $DATASETName      = $User_Preferences{"DATASETName"} ;
-$RUNNumber        = $User_Preferences{"RUNNumber"} ;
+$INPUTRuns        = $User_Preferences{"INPUTRuns"} ;
 $OUTPUTSAVEPath   = $User_Preferences{"OUTPUTSAVEPath"} ;
 $OUTPUTFILEName   = $User_Preferences{"OUTPUTFILEName"} ;
 $QUEUE            = $User_Preferences{"QUEUE"};
@@ -39,7 +39,7 @@ print "BASEDir = "          .$BASEDir."\n" ;
 print "X509_USER_PROXY = "  .$X509_USER_PROXY."\n" ;
 print "JOBCfgTemplate = "   .$JOBCfgTemplate."\n" ;
 print "DATASETName = "      .$DATASETName."\n" ;
-print "RUNNUmber = "        .$RUNNumber."\n" ;
+print "INPUTRuns = "        .$INPUTRuns."\n" ;
 print "OUTPUTSAVEPath = "   .$OUTPUTSAVEPath."\n" ;
 print "OUTPUTFILEName = "   .$OUTPUTFILEName."\n" ;
 print "QUEUE  = "           .$QUEUE."\n" ;
@@ -56,44 +56,58 @@ open(SAMPLEJOBLISTFILE, ">", $sampleJobListFile);
 # PG prepare the array containing the root files list
 #####################################################
 
-$totNumber = 0;
-$jobNumber = 0;
+@runs = split /,/, $INPUTRuns;
 
-$JOBdir = $RUNNumber;
+$totalJobs = 0;
 
-$LISTOFSamples = "fileList.txt";
-$command = "touch ".$LISTOFSamples ;
-system ($command) ;
-$command = "python ./das_client.py --query='file dataset=".$DATASETName." run=".$RUNNumber."' --limit=0 >> fileList.txt \n" ;
-#print $command ;
-system ("python ./das_client.py --query='file dataset=".$DATASETName." run=".$RUNNumber."' --limit=0 >> fileList.txt \n") ;
+for($index=0;$index<=$#runs;$index++)
+{
+
+ $RUNNumber = $runs[$index]; 
+ $totNumber = 0;
+ $jobNumber = 0;
+
+ $JOBdir = $RUNNumber;
+
+ $LISTOFSamples = "fileList.txt";
+ $command = "touch ".$LISTOFSamples ;
+ system ($command) ;
+ $command = "python ./das_client.py --query='file dataset=".$DATASETName." run=".$RUNNumber."' --limit=0 >> fileList.txt \n" ;
+ #print $command ;
+ system ("python ./das_client.py --query='file dataset=".$DATASETName." run=".$RUNNumber."' --limit=0 >> fileList.txt \n") ;
   
-open (LISTOFSamples,$LISTOFSamples) ;
-while (<LISTOFSamples>)
-{
+ open (LISTOFSamples,$LISTOFSamples) ;
+ while (<LISTOFSamples>)
+ {
     ++$totNumber;
-}
+ }
 
-$JOBModulo = 1;
+ $JOBModulo = 1;
 
-$jobNumber = int($totNumber/$JOBModulo);
-if( $totNumber%$JOBModulo != 0)
-{
-    $jobNumber = $jobNumber+1;
-}
+ $jobNumber = int($totNumber/$JOBModulo);
+ if( $totNumber%$JOBModulo != 0)
+ {
+     $jobNumber = $jobNumber+1;
+ }
+ 
+ if($totNumber == 1){ 
+    print "WARNING: ".$RUNNumber." has only 1 file ----> SKIP \n";
+    next; 
+ }
 
-print "NumberOfJobs = ".$jobNumber."\n";
-system ("mkdir ".$JOBdir." \n") ;
+ $totalJobs = $totalJobs + $totNumber;
+ print $RUNNumber.": NumberOfJobs = ".$jobNumber."\n";
+ system ("mkdir ".$JOBdir." \n") ;
 
-################
-# loop over jobs 
-################
+ ################
+ # loop over jobs 
+ ################
 
-$currDir = `pwd` ;
-chomp ($currDir) ;
+ $currDir = `pwd` ;
+ chomp ($currDir) ; 
 
-for($jobIt = 1; $jobIt <= $jobNumber; ++$jobIt)
-{
+ for($jobIt = 1; $jobIt <= $jobNumber; ++$jobIt)
+ {
     
 	$jobDir = $currDir."/".$JOBdir."/JOB_".$jobIt ;
 	system ("mkdir ".$jobDir." \n") ;
@@ -181,6 +195,9 @@ for($jobIt = 1; $jobIt <= $jobNumber; ++$jobIt)
 	
         $command = "bsub -cwd ".$jobDir." -q ".$QUEUE." ".$tempBjob."\n" ; 
 	print SAMPLEJOBLISTFILE $command."\n";
-}  
+ }  
 
-system("rm fileList.txt") ;
+ system("rm fileList.txt") ;
+}
+
+print "totalJobs = ".$totalJobs."\n";
