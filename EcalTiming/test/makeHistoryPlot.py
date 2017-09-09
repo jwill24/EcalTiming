@@ -66,6 +66,7 @@ date_begin=""
 date_end=""
 
 timeStamp_list=[]
+allCalib_list=[]
 icount = 0
 
 
@@ -76,15 +77,14 @@ if(inList != ""):
       for pos,x in enumerate(lines_interCalib):
          lines_interCalib_split = lines_interCalib[pos].split("/")
          interCalib_time = lines_interCalib_split[len(lines_interCalib_split)-1].split("_")
-         print interCalib_time
          icount = icount+1
          year = interCalib_time[1]
          if(interCalib_time[3].find(".xml") != -1):
             date = interCalib_time[3].replace(".xml", "")+"/"+interCalib_time[2]+"/"+interCalib_time[1]
-            calibFromXML(lines_interCalib[pos], date, icount, timeStamp_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus)
+            calibFromXML(lines_interCalib[pos], date, icount, timeStamp_list, allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus)
          if(interCalib_time[3].find(".dat") != -1):
             date = interCalib_time[3].replace(".dat", "")+"/"+interCalib_time[2]+"/"+interCalib_time[1]
-            calibFromDAT(lines_interCalib[pos], date, icount, timeStamp_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus)
+            calibFromDAT(lines_interCalib[pos], date, icount, timeStamp_list, allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus)
 
 else:
    #dump IOVs xml
@@ -103,10 +103,14 @@ else:
                print x
                icount = icount+1
                command = os.system("conddb dump "+ str(line_IOVs_split[5]) +" > dump_tmp")
-               calibFromXML("dump_tmp", date, icount, timeStamp_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus)
+               calibFromXML("dump_tmp", date, icount, timeStamp_list, allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus)
 
 timeStamp_begin = timeStamp_list[0]
 timeStamp_end = timeStamp_list[len(timeStamp_list)-1]
+
+allCalib_list.sort()
+y_min = allCalib_list[0]-0.05
+y_max = allCalib_list[len(allCalib_list)-1]+0.2
 
 g_EBMinus.SetMarkerColor(600)
 g_EBMinus.SetLineColor(600)
@@ -124,7 +128,6 @@ g_EBMinus.GetYaxis().SetLabelSize(0.05)
 g_EBMinus.GetYaxis().SetTitleSize(0.05)
 g_EBMinus.GetYaxis().SetTitleOffset(1.1)
 g_EBMinus.GetYaxis().SetTitleFont(42)
-g_EBMinus.GetYaxis().SetRangeUser(-0.7,0.3)
 
 g_EBPlus.SetMarkerColor(1)
 g_EBPlus.SetLineColor(1)
@@ -142,7 +145,6 @@ g_EBPlus.GetYaxis().SetLabelSize(0.05)
 g_EBPlus.GetYaxis().SetTitleSize(0.05)
 g_EBPlus.GetYaxis().SetTitleOffset(1.1)
 g_EBPlus.GetYaxis().SetTitleFont(42)
-g_EBPlus.GetYaxis().SetRangeUser(-0.7,0.3)
 
 g_EEMinus.SetMarkerColor(632)
 g_EEMinus.SetLineColor(632)
@@ -160,7 +162,6 @@ g_EEMinus.GetYaxis().SetLabelSize(0.05)
 g_EEMinus.GetYaxis().SetTitleSize(0.05)
 g_EEMinus.GetYaxis().SetTitleOffset(1.1)
 g_EEMinus.GetYaxis().SetTitleFont(42)
-g_EEMinus.GetYaxis().SetRangeUser(-0.7,0.3)
    
 g_EEPlus.SetMarkerColor(401)
 g_EEPlus.SetLineColor(401)
@@ -178,7 +179,6 @@ g_EEPlus.GetYaxis().SetLabelSize(0.05)
 g_EEPlus.GetYaxis().SetTitleSize(0.05)
 g_EEPlus.GetYaxis().SetTitleOffset(1.1)
 g_EEPlus.GetYaxis().SetTitleFont(42)
-g_EEPlus.GetYaxis().SetRangeUser(-0.7,0.3)
 
 test = TH1F("test","Ecal Timing ["+str(year)+"]",1000,float(timeStamp_begin-0.001e+9),float(timeStamp_end+0.001e+9))
 test.SetStats(0)
@@ -187,10 +187,10 @@ test.SetFillStyle(3004)
 test.SetLineColor(0)
 test.SetLineWidth(3)
 test.SetMarkerStyle(20)
-test.GetXaxis().SetTitle("IOV starting date")
+test.GetXaxis().SetTitle("date")
 test.GetXaxis().SetTimeDisplay(1)
 test.GetXaxis().SetTimeFormat("%d/%m%F1970-01-01 00:00:00s0")
-#test.GetXaxis().SetNdivisions(4010)
+test.GetXaxis().SetNdivisions(512)
 test.GetXaxis().SetLabelFont(42)
 test.GetXaxis().SetLabelOffset(0.007)
 test.GetXaxis().SetLabelSize(0.04)
@@ -202,17 +202,11 @@ test.GetYaxis().SetLabelOffset(0.007)
 test.GetYaxis().SetLabelSize(0.05)
 test.GetYaxis().SetTitleSize(0.05)
 test.GetYaxis().SetTitleFont(42)
-test.GetZaxis().SetLabelFont(42)
-test.GetZaxis().SetLabelOffset(0.007)
-test.GetZaxis().SetLabelSize(0.05)
-test.GetZaxis().SetTitleSize(0.05)
-test.GetZaxis().SetTitleFont(42)
 test.GetYaxis().SetLabelFont(42)
-#test.GetYaxis().SetRangeUser(-0.5,2.1)
-test.GetYaxis().SetRangeUser(-0.7,0.3)
+test.GetYaxis().SetRangeUser(float(y_min),float(y_max))
 
-leg = TLegend(0.185,0.8,0.915,0.9,"","brNDC")
-leg.SetFillStyle(0)
+leg = TLegend(0.185,0.8,0.815,0.86,"","brNDC")
+#leg.SetFillStyle(0)
 leg.SetBorderSize(0)
 leg.SetTextSize(0.04)
 leg.SetFillColor(0)
@@ -223,42 +217,42 @@ leg.AddEntry(g_EEMinus, "EE-", "P")
 leg.AddEntry(g_EEPlus, "EE+", "P")
 
 #Prompt IOVS
-line_IOV1_calib = TLine(1494460800,-0.7,1494460800,0.3)
+line_IOV1_calib = TLine(1494460800,float(y_min),1494460800,float(y_max))
 line_IOV1_calib.SetLineColor(633)
 line_IOV1_calib.SetLineStyle(8)
 line_IOV1_calib.SetLineWidth(2)
 
-line_IOV1_in = TLine(1496880000,-0.7,1496880000,0.3)
+line_IOV1_in = TLine(1496880000,float(y_min),1496880000,float(y_max))
 line_IOV1_in.SetLineColor(417)
 line_IOV1_in.SetLineStyle(8)
 line_IOV1_in.SetLineWidth(2)
 
-line_IOV2_calib = TLine(1497744000,-0.7,1497744000,0.3)
+line_IOV2_calib = TLine(1497744000,float(y_min),1497744000,float(y_max))
 line_IOV2_calib.SetLineColor(633)
 line_IOV2_calib.SetLineStyle(8)
 line_IOV2_calib.SetLineWidth(2)
 
-line_IOV2_in = TLine(1498780800,-0.7,1498780800,0.3)
+line_IOV2_in = TLine(1498780800,float(y_min),1498780800,float(y_max))
 line_IOV2_in.SetLineColor(417)
 line_IOV2_in.SetLineStyle(8)
 line_IOV2_in.SetLineWidth(2)
 
-line_IOV3_calib = TLine(1500508800,-0.7,1500508800,0.3)
+line_IOV3_calib = TLine(1500508800,float(y_min),1500508800,float(y_max))
 line_IOV3_calib.SetLineColor(633)
 line_IOV3_calib.SetLineStyle(8)
 line_IOV3_calib.SetLineWidth(2)
 
-line_IOV3_in = TLine(1501459200,-0.7,1501459200,0.3)
+line_IOV3_in = TLine(1501459200,float(y_min),1501459200,float(y_max))
 line_IOV3_in.SetLineColor(417)
 line_IOV3_in.SetLineStyle(8)
 line_IOV3_in.SetLineWidth(2)
 
-line_IOV4_calib = TLine(1502064000,-0.7,1502064000,0.3)
+line_IOV4_calib = TLine(1502064000,float(y_min),1502064000,float(y_max))
 line_IOV4_calib.SetLineColor(633)
 line_IOV4_calib.SetLineStyle(8)
 line_IOV4_calib.SetLineWidth(2)
 
-line_IOV4_in = TLine(1503273600,-0.7,1503273600,0.3)
+line_IOV4_in = TLine(1503273600,float(y_min),1503273600,float(y_max))
 line_IOV4_in.SetLineColor(417)
 line_IOV4_in.SetLineStyle(8)
 line_IOV4_in.SetLineWidth(2)
@@ -266,19 +260,27 @@ line_IOV4_in.SetLineWidth(2)
 c1 = TCanvas("c1","c1",1)
 c1.SetGrid()
 test.Draw("H")
+if(float(timeStamp_begin-0.001e+9)<=1494460800. and float(timeStamp_end+0.001e+9)>=1494460800.):
+   line_IOV1_calib.Draw("same")
+if(float(timeStamp_begin-0.001e+9)<=1496880000. and float(timeStamp_end+0.001e+9)>=1496880000.):
+   line_IOV1_in.Draw("same")
+if(float(timeStamp_begin-0.001e+9)<=1497744000. and float(timeStamp_end+0.001e+9)>=1497744000.):
+   line_IOV2_calib.Draw("same")
+if(float(timeStamp_begin-0.001e+9)<=1498780800. and float(timeStamp_end+0.001e+9)>=1498780800.):
+   line_IOV2_in.Draw("same")
+if(float(timeStamp_begin-0.001e+9)<=1500508800. and float(timeStamp_end+0.001e+9)>=1500508800.):
+   line_IOV3_calib.Draw("same")
+if(float(timeStamp_begin-0.001e+9)<=1501459200. and float(timeStamp_end+0.001e+9)>=1501459200.):
+   line_IOV3_in.Draw("same")
+if(float(timeStamp_begin-0.001e+9)<=1502064000. and float(timeStamp_end+0.001e+9)>=1502064000.):
+   line_IOV4_calib.Draw("same")
+if(float(timeStamp_begin-0.001e+9)<=1503273600. and float(timeStamp_end+0.001e+9)>=1503273600.):
+   line_IOV4_in.Draw("same")
 g_EBMinus.Draw("P,same")
 g_EBPlus.Draw("P,same")
 g_EEMinus.Draw("P,same")
 g_EEPlus.Draw("P,same")
 leg.Draw("same")
-line_IOV1_calib.Draw("same")
-line_IOV1_in.Draw("same")
-line_IOV2_calib.Draw("same")
-line_IOV2_in.Draw("same")
-line_IOV3_calib.Draw("same")
-line_IOV3_in.Draw("same")
-line_IOV4_calib.Draw("same")
-line_IOV4_in.Draw("same")
 c1.SaveAs("Timing_History_"+str(year)+".png","png")
 c1.SaveAs("Timing_History_"+str(year)+".pdf","pdf") 
 
