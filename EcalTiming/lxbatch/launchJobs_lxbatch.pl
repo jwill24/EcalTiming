@@ -72,8 +72,6 @@ for($index=0;$index<=$#runs;$index++)
  $LISTOFSamples = "fileList.txt";
  $command = "touch ".$LISTOFSamples ;
  system ($command) ;
- $command = "python ./das_client.py --query='file dataset=".$DATASETName." run=".$RUNNumber."' --limit=0 >> fileList.txt \n" ;
- #print $command ;
  system ("python ./das_client.py --query='file dataset=".$DATASETName." run=".$RUNNumber."' --limit=0 >> fileList.txt \n") ;
   
  open (LISTOFSamples,$LISTOFSamples) ;

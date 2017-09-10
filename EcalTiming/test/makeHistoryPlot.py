@@ -55,10 +55,10 @@ def printme( str ):
 
 #gStyle.SetOptStat(0)
 
-g_EBMinus = TGraph()
-g_EBPlus = TGraph()
-g_EEMinus = TGraph()
-g_EEPlus = TGraph()
+g_EBMinus = TGraphErrors()
+g_EBPlus = TGraphErrors()
+g_EEMinus = TGraphErrors()
+g_EEPlus = TGraphErrors()
 
 timeStamp_begin=0
 timeStamp_end=0
@@ -180,7 +180,7 @@ g_EEPlus.GetYaxis().SetTitleSize(0.05)
 g_EEPlus.GetYaxis().SetTitleOffset(1.1)
 g_EEPlus.GetYaxis().SetTitleFont(42)
 
-test = TH1F("test","Ecal Timing ["+str(year)+"]",1000,float(timeStamp_begin-0.001e+9),float(timeStamp_end+0.001e+9))
+test = TH1F("test","Ecal Timing ["+str(year)+"D]",1000,float(timeStamp_begin-0.001e+9),float(timeStamp_end+0.001e+9))
 test.SetStats(0)
 test.SetFillColor(1)
 test.SetFillStyle(3004)
@@ -281,8 +281,8 @@ g_EBPlus.Draw("P,same")
 g_EEMinus.Draw("P,same")
 g_EEPlus.Draw("P,same")
 leg.Draw("same")
-c1.SaveAs("Timing_History_"+str(year)+".png","png")
-c1.SaveAs("Timing_History_"+str(year)+".pdf","pdf") 
+c1.SaveAs("Timing_History_"+str(year)+"D.png","png")
+c1.SaveAs("Timing_History_"+str(year)+"D.pdf","pdf") 
 
 if(inList == ""): 
    command = os.system("rm IOVs_tmp")
