@@ -56,7 +56,7 @@ if(payload != ""):
 if(inList != ""):
    print "inList       = ",inList 
 if(calib != ""):
-   print "calib        = ",run 
+   print "calib        = ",calib 
 
 IOVs_date = []
 IOVs_time = []
