@@ -273,6 +273,11 @@ line_IOV4_in = TLine(1503273600,float(y_min),1503273600,float(y_max))
 line_IOV4_in.SetLineColor(417)
 line_IOV4_in.SetLineStyle(8)
 line_IOV4_in.SetLineWidth(2)
+
+line_IOV5_calib = TLine(1506902400,float(y_min),1506902400,float(y_max))
+line_IOV5_calib.SetLineColor(633)
+line_IOV5_calib.SetLineStyle(8)
+line_IOV5_calib.SetLineWidth(2)
   
 c1 = TCanvas("c1","c1",1)
 c1.SetGrid()
@@ -295,6 +300,8 @@ if(float(timeStamp_begin-0.001e+9)<=1502064000. and float(timeStamp_end+0.001e+9
    line_IOV4_calib.Draw("same")
 if(float(timeStamp_begin-0.001e+9)<=1503273600. and float(timeStamp_end+0.001e+9)>=1503273600.):
    line_IOV4_in.Draw("same")
+if(float(timeStamp_begin-0.001e+9)<=1506902400. and float(timeStamp_end+0.001e+9)>=1506902400.):
+   line_IOV5_calib.Draw("same")
 g_EBMinus.Draw("P,same")
 g_EBPlus.Draw("P,same")
 g_EEMinus.Draw("P,same")
