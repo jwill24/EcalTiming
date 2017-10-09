@@ -3,6 +3,7 @@
 import sys, math, os, collections, getopt, subprocess, time, shutil, datetime
 from ROOT import TFile, TH1, TH1F, TCanvas, TLegend, TGraph, TGraphErrors, gROOT, gPad, TAttText, TText, TGaxis, TMath, TStyle, TColor
 from array import array
+import os.path
 
 def computeMean (calib, calib_err) :
    mean = 0.
@@ -25,10 +26,15 @@ def computeError (calib_err) :
    return error    
 
 def calibFromXML (inFile, date, icount, timeStamp_list, allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus) : 
+   if(inFile.find("#") != -1):
+      return
    with open(inFile) as f_dump:
       data_dump = f_dump.read()
       lines_dump = data_dump.splitlines()  
-      #fill with ICs
+      EB_plus = []
+      EB_minus = []
+      EE_plus = []
+      EE_minus = []
       for pos2,x2 in enumerate(lines_dump):
          x2 = x2.replace("<item>", "")
          x2 = x2.replace("</item>", "")
@@ -49,7 +55,7 @@ def calibFromXML (inFile, date, icount, timeStamp_list, allCalib_list, g_EBMinus
    allCalib_list.append(float(EE_p_mean))
    EE_m_mean = float(sum(EE_minus))/len(EE_minus)
    allCalib_list.append(float(EE_m_mean))
-   print "---> EB+: ",EB_p_mean,", EB-:",EB_m_mean,", EE+:",EE_p_mean,", EE-:",EE_m_mean,"\n"
+   print date," ---> EB+: ",EB_p_mean,", EB-:",EB_m_mean,", EE+:",EE_p_mean,", EE-:",EE_m_mean,"\n"
    timeStamp = time.mktime(datetime.datetime.strptime(date, "%d/%m/%Y").timetuple())
    timeStamp_list.append(float(timeStamp))
    g_EBMinus.SetPoint(icount,timeStamp,EB_m_mean)
@@ -135,4 +141,59 @@ def calibFromDAT (inFile, date, icount, timeStamp_list, allCalib_list, g_EBMinus
    g_EEPlus.SetPoint(icount,timeStamp,EE_p_mean)  
    #g_EEPlus.SetPointError(icount,0.,float(EE_p_error))
 
+def makeAbsTimingXML(calib, timeIntercalib_EB, timeIntercalib_EE, pos_EB, pos_EE, crystals_EB, crystals_EE, output) :
+   with open(str(calib)) as f_interCalib:
+      data_interCalib = f_interCalib.read()
+   lines_interCalib = data_interCalib.splitlines() 
+   for pos,x in enumerate(lines_interCalib):
+      lines_interCalib_split = x.split()
+      if(pos>=0 and pos<=60496): 
+         if(lines_interCalib_split[3] == 'nan' or lines_interCalib_split[3] == '-nan' or abs(float(lines_interCalib_split[3]))<=(abs(float(lines_interCalib_split[4]))/math.sqrt(float(lines_interCalib_split[5])))):
+            timeIntercalib_EB[lines_interCalib_split[7]]=float(0.) 
+            #print "WARNING:",lines_interCalib_split[0],lines_interCalib_split[1],lines_interCalib_split[2],"- anomalous crystal, setting calibration to 0"
+         else:
+            timeIntercalib_EB[lines_interCalib_split[7]]=float(lines_interCalib_split[3])
+         crystals_EB[lines_interCalib_split[7]] = bool(True)
+      else:  
+         if(lines_interCalib_split[3] == 'nan' or lines_interCalib_split[3] == '-nan' or abs(float(lines_interCalib_split[3]))<=(abs(float(lines_interCalib_split[4]))/math.sqrt(float(lines_interCalib_split[5])))):
+            timeIntercalib_EE[lines_interCalib_split[7]]=float(0.) 
+            #print "WARNING:",lines_interCalib_split[0],lines_interCalib_split[1],lines_interCalib_split[2],"- anomalous crystal, setting calibration to 0"
+         else:
+            timeIntercalib_EE[lines_interCalib_split[7]]=float(lines_interCalib_split[3])
+         crystals_EE[lines_interCalib_split[7]] = bool(True)
+
+   with open("dump_tmp") as f_dump:
+      data_dump = f_dump.read()
+   lines_dump = data_dump.splitlines()  
+
+   if os.path.isfile(str(output)):
+      print "WARNING: overwriting ",output
+      command = os.system("rm "+str(output))
+   f_tag = open(str(output),"w")
+   for pos,x in enumerate(lines_dump):
+       x_intro = str(x)+"\n"
+       if(pos<8 or (pos>61207 and pos<61214) or pos>75861):
+          x = str(x)+"\n"
+          f_tag.write(x)
+       elif(pos>=8 and pos<=61207): 
+          x = x.replace("<item>", "")
+          x = x.replace("</item>", "")
+          if(crystals_EB[pos_EB[pos-8]] == True):
+             x = float(x)-float(timeIntercalib_EB[pos_EB[pos-8]]) 
+          else:
+             x = float(x) 
+          x = "{:.9e}".format(x)
+          x_abs = "			<item>"+str(x)+"</item> \n"
+          f_tag.write(x_abs)
+       elif(pos>=61214 and pos<=75861):
+          x = x.replace("<item>", "")
+          x = x.replace("</item>", "")
+          if(crystals_EE[pos_EE[pos-61214]] == True):
+             x = float(x)-float(timeIntercalib_EE[pos_EE[pos-61214]]) 
+          else:
+             x = float(x) 
+          x = "{:.9e}".format(x)
+          x_abs = "			<item>"+str(x)+"</item> \n"
+          f_tag.write(x_abs)
+   f_tag.close()
 

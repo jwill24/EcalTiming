@@ -147,7 +147,7 @@ if(calib == ""):
             print date," ---> ",IOVs_info[icount]
             line_IOVs_split = IOVs_info[icount].split()
             command = os.system("conddb dump "+ str(line_IOVs_split[5]) +" > dump_tmp")
-         makeAbsTimingXML(lines_interCalib[pos], timeIntercalib_EB, timeIntercalib_EE, pos_EB, pos_EE, crystals_EB, crystals_EE, output_absCalib)
+         makeAbsTimingXML(lines_interCalib[pos], timeIntercalib_EB, timeIntercalib_EE, pos_EB, pos_EE, crystals_EB, crystals_EE, str(output_absCalib))
          f_absCalib.write(str(output_absCalib)+"\n")
       else:
          print "WARNING: wrong import format! Skipping this IOV"  

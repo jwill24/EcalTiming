@@ -48,7 +48,7 @@
 #/eos/cms/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2017C/Calibration/299936_299996/ecalTiming-abs_2017_07_27.dat
 /eos/cms/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2017C/Calibration/300079_300087_300088_300106_300107_300117_300122/ecalTiming-abs_2017_07_29.xml
 /eos/cms/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2017C/Calibration/300123_300124_300155/ecalTiming-abs_2017_07_30.xml
-/eos/cms/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2017C/Calibration/300156_300157_300226_300233_300234_300235/ecalTiming-abs_2017_07_31.xml
+#/eos/cms/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2017C/Calibration/300156_300157_300226_300233_300234_300235/ecalTiming-abs_2017_07_31.xml
 /eos/cms/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2017C/Calibration/300236_300237_300238_300239_300240/ecalTiming-abs_2017_08_01.xml
 /eos/cms/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2017C/Calibration/300280_300282_300283_300284/ecalTiming-abs_2017_08_02.xml
 /eos/cms/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2017C/Calibration/300364_300375_300389_300400/ecalTiming-abs_2017_08_03.xml
@@ -67,7 +67,7 @@
 /eos/cms/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2017C/Calibration/301397_301399_301414_301417/ecalTiming-abs_2017_08_18.xml
 /eos/cms/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2017C/Calibration/301447_301448_301449_301450_301461/ecalTiming-abs_2017_08_19.xml
 /eos/cms/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2017C/Calibration/301472_301476/ecalTiming-abs_2017_08_20.xml
-/eos/cms/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2017C/Calibration/301480_301519_301524_301525_301529_301530_301531_301532/ecalTiming-abs_2017_08_21.xml
+#/eos/cms/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2017C/Calibration/301480_301519_301524_301525_301529_301530_301531_301532/ecalTiming-abs_2017_08_21.xml
 /eos/cms/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2017C/Calibration/301544_301557_301566_301567_301627/ecalTiming-abs_2017_08_22.xml
 /eos/cms/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2017C/Calibration/301664_301665/ecalTiming-abs_2017_08_23.xml
 /eos/cms/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2017C/Calibration/301909_301912_301913_301914/ecalTiming-abs_2017_08_26.xml
@@ -103,3 +103,8 @@
 /eos/cms/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2017E/Calibration/304209_304292/ecalTiming-abs_2017_10_02.xml
 /eos/cms/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2017E/Calibration/304333/ecalTiming-abs_2017_10_03.xml
 /eos/cms/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2017E/Calibration/304354_304364_304366/ecalTiming-abs_2017_10_04.xml
+/eos/cms/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2017E/Calibration/304446_304447_304449_304451/ecalTiming-abs_2017_10_05.xml
+/eos/cms/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2017E/Calibration/304505_304506_304507_304508/ecalTiming-abs_2017_10_05.xml
+/eos/cms/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2017E/Calibration/304562_304616/ecalTiming-abs_2017_10_06.xml
+/eos/cms/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2017E/Calibration/304625/ecalTiming-abs_2017_10_07.xml
+/eos/cms/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2017E/Calibration/304654_304655_304661_304662_304663/ecalTiming-abs_2017_10_08.xml
