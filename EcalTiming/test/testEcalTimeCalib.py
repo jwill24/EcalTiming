@@ -12,8 +12,39 @@
 #
 
 import FWCore.ParameterSet.Config as cms
+import os, sys, imp, re
+import FWCore.ParameterSet.VarParsing as VarParsing
 
 process = cms.Process("TEST")
+
+options = VarParsing.VarParsing('standard')
+options.register('xmlFile',
+                 "",
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.string,
+                 "xmlFile")
+options.register('sqliteFile',
+                 "",
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.string,
+                 "sqliteFile")
+options.register('firstRun',
+                 "",
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.int,
+                 "firstRun")
+options.register('tag',
+                 "",
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.string,
+                 "tag")
+
+options.parseArguments()
+#print options
+print "---> Input xmlFile    : ",options.xmlFile 
+print "---> Output sqliteFile: ",options.sqliteFile 
+print "---> firstRun         : ",options.firstRun
+print "---> tag              : ",options.tag
 
 process.MessageLogger=cms.Service("MessageLogger",
                               destinations=cms.untracked.vstring("cout"),
@@ -22,7 +53,7 @@ process.MessageLogger=cms.Service("MessageLogger",
 )
 process.load("CondCore.CondDB.CondDB_cfi")
 
-process.CondDB.connect = cms.string('sqlite_file:EcalTimeCalibConstants.db')
+process.CondDB.connect = cms.string('sqlite_file:'+str(options.sqliteFile))
 
 
 process.source = cms.Source("EmptyIOVSource",
@@ -37,7 +68,7 @@ process.PoolDBOutputService = cms.Service("PoolDBOutputService",
     timetype = cms.untracked.string('runnumber'),
     toPut = cms.VPSet(cms.PSet(
         record = cms.string('EcalTimeCalibConstantsRcd'),
-        tag = cms.string('EcalTimeCalibConstants')
+        tag = cms.string(str(options.tag))
          )),
     logconnect= cms.untracked.string('sqlite_file:logtestEcalTimeCalib.db')                                     
 )
@@ -47,8 +78,8 @@ process.mytest = cms.EDAnalyzer("EcalTimeCalibConstantsAnalyzer",
     loggingOn= cms.untracked.bool(True),
     SinceAppendMode=cms.bool(True),
     Source=cms.PSet(
-    xmlFile = cms.untracked.string('EcalTimeCalibConstants.xml'),
-    since = cms.untracked.int64(1)
+    xmlFile = cms.untracked.string(str(options.xmlFile)),
+    since = cms.untracked.int64(int(options.firstRun))
     )                            
 )
 
