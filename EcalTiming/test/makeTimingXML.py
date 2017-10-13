@@ -6,10 +6,10 @@ from array import array
 from historyPlot_utils import makeAbsTimingXML
 
 def usage():
-    print "Usage: python makeTimeCalibConstantsTag_step1.py --tag=[tag] --inList=[inList]"
-    print "Usage: python makeTimeCalibConstantsTag_step1.py --tag=[tag] --calib=[calib]"
-    print "Usage: python makeTimeCalibConstantsTag_step1.py --payload=[payload] --inList=[inList]"
-    print "Usage: python makeTimeCalibConstantsTag_step1.py --payload=[payload] --calib=[calib]"
+    print "Usage: python makeTimingXML.py --tag=[tag] --inList=[inList]"
+    print "Usage: python makeTimingXML.py --tag=[tag] --calib=[calib]"
+    print "Usage: python makeTimingXML.py --payload=[payload] --inList=[inList]"
+    print "Usage: python makeTimingXML.py --payload=[payload] --calib=[calib]"
     
 try:
      opts, args = getopt.getopt(sys.argv[1:], "t:i:c:p:h", ["tag=","inList=","calib=","payload=","help"])

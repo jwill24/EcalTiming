@@ -7,7 +7,7 @@ from historyPlot_utils import calibFromXML
 from historyPlot_utils import calibFromDAT
 
 def usage():
-    print "Usage: python makeHistoryPlot.py --tag=[tag] --year=[year] (--run=[run] --absTime)"
+    print "Usage: python makeHistoryPlot.py --tag=[tag] --year=[year]
     print "Usage: python makeHistoryPlot.py --inList=[inList] (--run=[run] --absTime)"
     
 try:
