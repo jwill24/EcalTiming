@@ -7,11 +7,11 @@ from historyPlot_utils import calibFromXML
 from historyPlot_utils import calibFromDAT
 
 def usage():
-    print "Usage: python makeHistoryPlot.py --tag=[tag] --year=[year]
-    print "Usage: python makeHistoryPlot.py --inList=[inList] (--run=[run] --absTime)"
+    print "Usage: python makeHistoryPlot.py --tag=[tag] --year=[year] (and/or --runBased)"
+    print "Usage: python makeHistoryPlot.py --inList=[inList] (--epoch=[epoch] and/or --absTime and/or --runBased)"
     
 try:
-     opts, args = getopt.getopt(sys.argv[1:], "t:y:i:r:ah", ["tag=","year=","inList=","run=","absTime","help"])
+     opts, args = getopt.getopt(sys.argv[1:], "t:y:i:e:arh", ["tag=","year=","inList=","epoch=","absTime","runBased","help"])
 
 except getopt.GetoptError:
      #* print help information and exit:*
@@ -21,9 +21,10 @@ except getopt.GetoptError:
 
 tag = ""
 year = ""
-run = ""
+epoch = ""
 inList = ""
 absTime = False
+runBased = False
 help = False
 for opt, arg in opts:
     
@@ -31,12 +32,14 @@ for opt, arg in opts:
         tag = arg
      if opt in ("--year"):
         year = arg
-     if opt in ("--run"):
-        run = arg
+     if opt in ("--epoch"):
+        epoch = arg
      if opt in ("--inList"):
         inList = arg  
      if opt in ("--absTime"):
-        absTime = True    
+        absTime = True   
+     if opt in ("--runBased"):
+        runBased = True   
      if opt in ("--help"):
         help = True     
 
@@ -44,7 +47,7 @@ if(help == True):
    usage()
    sys.exit(2)
 
-if((tag == "" and year == "" and run == "" and inList == "") or (tag != "" and year == "") or (tag == "" and year != "")):
+if((tag == "" and year == "" and epoch == "" and inList == "") or (tag != "" and year == "") or (tag == "" and year != "")):
    usage()
    sys.exit(2)
 
@@ -52,12 +55,14 @@ if(tag != ""):
    print "tag          = ",tag
 if(year != ""):
    print "year         = ",year
-if(run != ""):
-   print "run          = ",run
+if(epoch != ""):
+   print "epoch        = ",epoch
 if(inList != ""):
    print "inList       = ",inList  
 if(absTime == True):
-   print "absTime      = ",absTime  
+   print "absTime      = ",absTime 
+if(runBased == True):
+   print "runBased     = ",runBased  
 
 #gStyle.SetOptStat(0)
 
@@ -72,6 +77,7 @@ date_begin=""
 date_end=""
 
 timeStamp_list=[]
+timeStamp_point=[]
 allCalib_list=[]
 icount = 0
 
@@ -87,10 +93,16 @@ if(inList != ""):
          year = interCalib_time[1]
          if(interCalib_time[3].find(".xml") != -1):
             date = interCalib_time[3].replace(".xml", "")+"/"+interCalib_time[2]+"/"+interCalib_time[1]
-            calibFromXML(lines_interCalib[pos], date, icount, timeStamp_list, allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus)
+            if(runBased == True):
+               interCalib_run = lines_interCalib_split[len(lines_interCalib_split)-2].split("_")
+               date = float(interCalib_run[0])
+            calibFromXML(lines_interCalib[pos], date, icount, timeStamp_list, timeStamp_point, allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus, runBased)
          if(interCalib_time[3].find(".dat") != -1):
             date = interCalib_time[3].replace(".dat", "")+"/"+interCalib_time[2]+"/"+interCalib_time[1]
-            calibFromDAT(lines_interCalib[pos], date, icount, timeStamp_list, allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus)
+            if(runBased == True):
+               interCalib_run = lines_interCalib_split[len(lines_interCalib_split)-2].split("_")
+               date = float(interCalib_run[0])   
+            calibFromDAT(lines_interCalib[pos], date, icount, timeStamp_list, timeStamp_point,allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus, runBased)
 
 else:
    #dump IOVs xml
@@ -109,10 +121,14 @@ else:
                print x
                icount = icount+1
                command = os.system("conddb dump "+ str(line_IOVs_split[5]) +" > dump_tmp")
-               calibFromXML("dump_tmp", date, icount, timeStamp_list, allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus)
+               calibFromXML("dump_tmp", date, icount, timeStamp_list, allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus, runBased)
 
-timeStamp_begin = timeStamp_list[0]
-timeStamp_end = timeStamp_list[len(timeStamp_list)-1]
+if(runBased == True):
+   timeStamp_begin = timeStamp_point[0]
+   timeStamp_end = timeStamp_point[len(timeStamp_point)-1]
+else:
+   timeStamp_begin = timeStamp_list[0]
+   timeStamp_end = timeStamp_list[len(timeStamp_list)-1]
 
 allCalib_list.sort()
 y_min = allCalib_list[0]-0.05
@@ -186,25 +202,39 @@ g_EEPlus.GetYaxis().SetTitleSize(0.05)
 g_EEPlus.GetYaxis().SetTitleOffset(1.1)
 g_EEPlus.GetYaxis().SetTitleFont(42)
 
-if(absTime == False):
-   test = TH1F("test","Ecal Timing ["+str(year)+str(run)+"]",1000,float(timeStamp_begin-172800),float(timeStamp_end+172800))
+if(runBased == False):
+   if(absTime == False):
+      test = TH1F("test","Ecal Timing ["+str(year)+str(epoch)+"]",1000,float(timeStamp_begin-172800),float(timeStamp_end+172800))
+   else:
+      test = TH1F("test","Ecal Absolute Timing ["+str(year)+str(epoch)+"]",1000,float(timeStamp_begin-172800),float(timeStamp_end+172800))
 else:
-   test = TH1F("test","Ecal Absolute Timing ["+str(year)+str(run)+"]",1000,float(timeStamp_begin-172800),float(timeStamp_end+172800))
+   if(absTime == False):
+      test = TH1F("test","Ecal Timing ["+str(year)+str(epoch)+"]",len(timeStamp_point),float(timeStamp_begin-0.5),float(timeStamp_end+0.5))
+   else:
+      test = TH1F("test","Ecal Absolute Timing ["+str(year)+str(epoch)+"]",len(timeStamp_point),float(timeStamp_begin-0.5),float(timeStamp_end+0.5))
 test.SetStats(0)
 test.SetFillColor(1)
 test.SetFillStyle(3004)
 test.SetLineColor(0)
 test.SetLineWidth(3)
 test.SetMarkerStyle(20)
-test.GetXaxis().SetTitle("date")
-test.GetXaxis().SetTimeDisplay(1)
-test.GetXaxis().SetTimeFormat("%d/%m%F1970-01-01 00:00:00s0")
-test.GetXaxis().SetNdivisions(512)
-test.GetXaxis().SetLabelFont(42)
-test.GetXaxis().SetLabelOffset(0.007)
-test.GetXaxis().SetLabelSize(0.04)
-test.GetXaxis().SetTitleSize(0.05)
-test.GetXaxis().SetTitleFont(42)
+if(runBased == False):
+   test.GetXaxis().SetTitle("date")
+   test.GetXaxis().SetTimeDisplay(1)
+   test.GetXaxis().SetTimeFormat("%d/%m%F1970-01-01 00:00:00s0")
+   test.GetXaxis().SetNdivisions(512)
+   test.GetXaxis().SetLabelFont(42)
+   test.GetXaxis().SetLabelOffset(0.007)
+   test.GetXaxis().SetLabelSize(0.04) 
+   test.GetXaxis().SetTitleSize(0.05)
+   test.GetXaxis().SetTitleFont(42)
+else:
+   for pos,x in enumerate(timeStamp_list):
+      test.GetXaxis().SetBinLabel(pos+1,str(int(x)));
+      test.GetXaxis().LabelsOption("v")
+      test.GetXaxis().SetLabelFont(42)
+      test.GetXaxis().SetLabelOffset(0.005)
+      test.GetXaxis().SetLabelSize(0.04)
 if(absTime == False):
    test.GetYaxis().SetTitle("Average Time [ns]")
 else:
@@ -287,39 +317,40 @@ line_IOV5_in.SetLineWidth(2)
 c1 = TCanvas("c1","c1",1)
 c1.SetGrid()
 test.Draw("H")
-if(float(timeStamp_begin-0.001e+9)<=1494460800. and float(timeStamp_end+0.001e+9)>=1494460800.):
-   line_IOV1_calib.Draw("same")
-if(float(timeStamp_begin-0.001e+9)<=1494806400. and float(timeStamp_end+0.001e+9)>=1494806400.):
-   line_IOV1_inBad.Draw("same")
-if(float(timeStamp_begin-0.001e+9)<=1496880000. and float(timeStamp_end+0.001e+9)>=1496880000.):
-   line_IOV1_in.Draw("same")
-if(float(timeStamp_begin-0.001e+9)<=1497744000. and float(timeStamp_end+0.001e+9)>=1497744000.):
-   line_IOV2_calib.Draw("same")
-if(float(timeStamp_begin-0.001e+9)<=1498780800. and float(timeStamp_end+0.001e+9)>=1498780800.):
-   line_IOV2_in.Draw("same")
-if(float(timeStamp_begin-0.001e+9)<=1500508800. and float(timeStamp_end+0.001e+9)>=1500508800.):
-   line_IOV3_calib.Draw("same")
-if(float(timeStamp_begin-0.001e+9)<=1501459200. and float(timeStamp_end+0.001e+9)>=1501459200.):
-   line_IOV3_in.Draw("same")
-if(float(timeStamp_begin-0.001e+9)<=1502064000. and float(timeStamp_end+0.001e+9)>=1502064000.):
-   line_IOV4_calib.Draw("same")
-if(float(timeStamp_begin-0.001e+9)<=1503273600. and float(timeStamp_end+0.001e+9)>=1503273600.):
-   line_IOV4_in.Draw("same")
-if(float(timeStamp_begin-0.001e+9)<=1506902400. and float(timeStamp_end+0.001e+9)>=1506902400.):
-   line_IOV5_calib.Draw("same")
-if(float(timeStamp_begin-0.001e+9)<=1507161600. and float(timeStamp_end+0.001e+9)>=1507161600.):
-   line_IOV5_in.Draw("same")
+if(runBased == False):
+   if(float(timeStamp_begin-0.001e+9)<=1494460800. and float(timeStamp_end+0.001e+9)>=1494460800.):
+      line_IOV1_calib.Draw("same")
+   if(float(timeStamp_begin-0.001e+9)<=1494806400. and float(timeStamp_end+0.001e+9)>=1494806400.):
+      line_IOV1_inBad.Draw("same")
+   if(float(timeStamp_begin-0.001e+9)<=1496880000. and float(timeStamp_end+0.001e+9)>=1496880000.):
+      line_IOV1_in.Draw("same")
+   if(float(timeStamp_begin-0.001e+9)<=1497744000. and float(timeStamp_end+0.001e+9)>=1497744000.):
+      line_IOV2_calib.Draw("same")
+   if(float(timeStamp_begin-0.001e+9)<=1498780800. and float(timeStamp_end+0.001e+9)>=1498780800.):
+      line_IOV2_in.Draw("same")
+   if(float(timeStamp_begin-0.001e+9)<=1500508800. and float(timeStamp_end+0.001e+9)>=1500508800.):
+      line_IOV3_calib.Draw("same")
+   if(float(timeStamp_begin-0.001e+9)<=1501459200. and float(timeStamp_end+0.001e+9)>=1501459200.):
+      line_IOV3_in.Draw("same")
+   if(float(timeStamp_begin-0.001e+9)<=1502064000. and float(timeStamp_end+0.001e+9)>=1502064000.):
+      line_IOV4_calib.Draw("same")
+   if(float(timeStamp_begin-0.001e+9)<=1503273600. and float(timeStamp_end+0.001e+9)>=1503273600.):
+      line_IOV4_in.Draw("same")
+   if(float(timeStamp_begin-0.001e+9)<=1506902400. and float(timeStamp_end+0.001e+9)>=1506902400.):
+      line_IOV5_calib.Draw("same")
+   if(float(timeStamp_begin-0.001e+9)<=1507161600. and float(timeStamp_end+0.001e+9)>=1507161600.):
+      line_IOV5_in.Draw("same")
 g_EBMinus.Draw("P,same")
 g_EBPlus.Draw("P,same")
 g_EEMinus.Draw("P,same")
 g_EEPlus.Draw("P,same")
 leg.Draw("same")
 if(absTime == False):
-   c1.SaveAs("Timing_History_"+str(year)+str(run)+".png","png")
-   c1.SaveAs("Timing_History_"+str(year)+str(run)+".pdf","pdf") 
+   c1.SaveAs("Timing_History_"+str(year)+str(epoch)+".png","png")
+   c1.SaveAs("Timing_History_"+str(year)+str(epoch)+".pdf","pdf") 
 else:
-   c1.SaveAs("Timing_History_"+str(year)+str(run)+"_abs.png","png")
-   c1.SaveAs("Timing_History_"+str(year)+str(run)+"_abs.pdf","pdf") 
+   c1.SaveAs("Timing_History_"+str(year)+str(epoch)+"_abs.png","png")
+   c1.SaveAs("Timing_History_"+str(year)+str(epoch)+"_abs.pdf","pdf") 
 if(inList == ""): 
    command = os.system("rm IOVs_tmp")
    command = os.system("rm dump_tmp")
