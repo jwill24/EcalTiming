@@ -121,7 +121,7 @@ else:
                print x
                icount = icount+1
                command = os.system("conddb dump "+ str(line_IOVs_split[5]) +" > dump_tmp")
-               calibFromXML("dump_tmp", date, icount, timeStamp_list, allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus, runBased)
+               calibFromXML("dump_tmp", date, icount, timeStamp_list, timeStamp_point, allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus, runBased)
 
 if(runBased == True):
    timeStamp_begin = timeStamp_point[0]
@@ -229,9 +229,22 @@ if(runBased == False):
    test.GetXaxis().SetTitleSize(0.05)
    test.GetXaxis().SetTitleFont(42)
 else:
+   #timeStamp_tmp=[]
+   #timeStamp_tmp.append("10/10")
+   #timeStamp_tmp.append("10/10 (15 GeV)")
+   #timeStamp_tmp.append("10/10 (20 GeV)")
+   #timeStamp_tmp.append("11/10")
+   #timeStamp_tmp.append("11/10 (10 GeV)")
+   #timeStamp_tmp.append("11/10 (15 GeV)")
+   #timeStamp_tmp.append("11/10 (20 GeV)")
+   #timeStamp_tmp.append("11/10 (old Ped)")
+   #timeStamp_tmp.append("11/10 (old PS)")
+   #timeStamp_tmp.append("11/10 (old Ped&PS)")
+   #for pos,x in enumerate(timeStamp_tmp):
    for pos,x in enumerate(timeStamp_list):
       test.GetXaxis().SetBinLabel(pos+1,str(int(x)));
-      test.GetXaxis().LabelsOption("v")
+      #test.GetXaxis().SetBinLabel(pos+1,str(x));
+      #test.GetXaxis().LabelsOption("v")
       test.GetXaxis().SetLabelFont(42)
       test.GetXaxis().SetLabelOffset(0.005)
       test.GetXaxis().SetLabelSize(0.04)

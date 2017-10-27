@@ -91,7 +91,8 @@ EcalTiming
    * cd EcalTiming/EcalTiming/test/
    * eg: python makeHistoryPlot.py --tag=EcalTimeCalibConstants_v01_express --year=2017
    * eg: python makeHistoryPlot.py --inList=input_List_2017.dat
-   * eg: python makeHistoryPlot.py --inList=input_List_2017_RunE.dat --run=E
+   * eg: python makeHistoryPlot.py --inList=input_List_2017.dat --runBased
+   * eg: python makeHistoryPlot.py --inList=input_List_2017_RunE.dat --epoch=E
    * eg: python makeHistoryPlot.py --inList=input_List_2017_absTiming.dat --absTime 
 
     

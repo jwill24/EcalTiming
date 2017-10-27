@@ -25,7 +25,7 @@ def computeError (calib_err) :
    error = 1./math.sqrt(error)
    return error    
 
-def calibFromXML (inFile, date, icount, timeStamp_list, allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus) : 
+def calibFromXML (inFile, date, icount, timeStamp_list, timeStamp_point, allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus, runBased) : 
    if(inFile.find("#") != -1):
       return
    with open(inFile) as f_dump:
@@ -55,15 +55,25 @@ def calibFromXML (inFile, date, icount, timeStamp_list, allCalib_list, g_EBMinus
    allCalib_list.append(float(EE_p_mean))
    EE_m_mean = float(sum(EE_minus))/len(EE_minus)
    allCalib_list.append(float(EE_m_mean))
-   print date," ---> EB+: ",EB_p_mean,", EB-:",EB_m_mean,", EE+:",EE_p_mean,", EE-:",EE_m_mean,"\n"
-   timeStamp = time.mktime(datetime.datetime.strptime(date, "%d/%m/%Y").timetuple())
-   timeStamp_list.append(float(timeStamp))
-   g_EBMinus.SetPoint(icount,timeStamp,EB_m_mean)
-   g_EBPlus.SetPoint(icount,timeStamp,EB_p_mean)
-   g_EEMinus.SetPoint(icount,timeStamp,EE_m_mean)
-   g_EEPlus.SetPoint(icount,timeStamp,EE_p_mean) 
+   if(runBased == False):
+      print date," ---> EB+: ",EB_p_mean,", EB-:",EB_m_mean,", EE+:",EE_p_mean,", EE-:",EE_m_mean,"\n"
+      timeStamp = time.mktime(datetime.datetime.strptime(date, "%d/%m/%Y").timetuple())
+      timeStamp_list.append(float(timeStamp))
+      g_EBMinus.SetPoint(icount,timeStamp,EB_m_mean)
+      g_EBPlus.SetPoint(icount,timeStamp,EB_p_mean)
+      g_EEMinus.SetPoint(icount,timeStamp,EE_m_mean)
+      g_EEPlus.SetPoint(icount,timeStamp,EE_p_mean) 
+   else:
+      print int(date)," ---> EB+: ",EB_p_mean,", EB-:",EB_m_mean,", EE+:",EE_p_mean,", EE-:",EE_m_mean,"\n"
+      timeStamp_list.append(date)
+      timeStamp_point.append(icount-1)
+      timeStamp = icount-1
+      g_EBMinus.SetPoint(icount-1,timeStamp,EB_m_mean)
+      g_EBPlus.SetPoint(icount-1,timeStamp,EB_p_mean)
+      g_EEMinus.SetPoint(icount-1,timeStamp,EE_m_mean)
+      g_EEPlus.SetPoint(icount-1,timeStamp,EE_p_mean) 
 
-def calibFromDAT (inFile, date, icount, timeStamp_list, allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus) : 
+def calibFromDAT (inFile, date, icount, timeStamp_list, timeStamp_point, allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus, runBased) : 
    if(inFile.find("#") != -1):
       return
    with open(inFile) as f_dump:
@@ -129,17 +139,31 @@ def calibFromDAT (inFile, date, icount, timeStamp_list, allCalib_list, g_EBMinus
       EE_m_mean = -999.
       EE_m_error = 0.
 
-   print date," ---> EB+: ",EB_p_mean,", EB-:",EB_m_mean,", EE+:",EE_p_mean,", EE-:",EE_m_mean,"\n"
-   timeStamp = time.mktime(datetime.datetime.strptime(date, "%d/%m/%Y").timetuple())
-   timeStamp_list.append(float(timeStamp))
-   g_EBMinus.SetPoint(icount,timeStamp,EB_m_mean)
-   #g_EBMinus.SetPointError(icount,0.,float(EB_m_error))
-   g_EBPlus.SetPoint(icount,timeStamp,EB_p_mean)
-   #g_EBPlus.SetPointError(icount,0.,float(EB_p_error))
-   g_EEMinus.SetPoint(icount,timeStamp,EE_m_mean)
-   #g_EEMinus.SetPointError(icount,0.,float(EE_m_error))
-   g_EEPlus.SetPoint(icount,timeStamp,EE_p_mean)  
-   #g_EEPlus.SetPointError(icount,0.,float(EE_p_error))
+   if(runBased == False):
+      print date," ---> EB+: ",EB_p_mean,", EB-:",EB_m_mean,", EE+:",EE_p_mean,", EE-:",EE_m_mean,"\n"
+      timeStamp = time.mktime(datetime.datetime.strptime(date, "%d/%m/%Y").timetuple())
+      timeStamp_list.append(float(timeStamp))
+      g_EBMinus.SetPoint(icount,timeStamp,EB_m_mean)
+      #g_EBMinus.SetPointError(icount,0.,float(EB_m_error))
+      g_EBPlus.SetPoint(icount,timeStamp,EB_p_mean)
+      #g_EBPlus.SetPointError(icount,0.,float(EB_p_error))
+      g_EEMinus.SetPoint(icount,timeStamp,EE_m_mean)
+      #g_EEMinus.SetPointError(icount,0.,float(EE_m_error))
+      g_EEPlus.SetPoint(icount,timeStamp,EE_p_mean)  
+      #g_EEPlus.SetPointError(icount,0.,float(EE_p_error))
+   else:
+      print int(date)," ---> EB+: ",EB_p_mean,", EB-:",EB_m_mean,", EE+:",EE_p_mean,", EE-:",EE_m_mean,"\n"
+      timeStamp_list.append(date)
+      timeStamp_point.append(icount-1)
+      timeStamp = icount-1
+      g_EBMinus.SetPoint(icount-1,timeStamp,EB_m_mean)
+      #g_EBMinus.SetPointError(icount-1,0.,float(EB_m_error))
+      g_EBPlus.SetPoint(icount-1,timeStamp,EB_p_mean)
+      #g_EBPlus.SetPointError(icount-1,0.,float(EB_p_error))
+      g_EEMinus.SetPoint(icount-1,timeStamp,EE_m_mean)
+      #g_EEMinus.SetPointError(icount-1,0.,float(EE_m_error))
+      g_EEPlus.SetPoint(icount-1,timeStamp,EE_p_mean)  
+      #g_EEPlus.SetPointError(icount-1,0.,float(EE_p_error))
 
 def makeAbsTimingXML(calib, timeIntercalib_EB, timeIntercalib_EE, pos_EB, pos_EE, crystals_EB, crystals_EE, output) :
    with open(str(calib)) as f_interCalib:
