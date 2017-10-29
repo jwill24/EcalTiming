@@ -7,11 +7,11 @@ from historyPlot_utils import calibFromXML
 from historyPlot_utils import calibFromDAT
 
 def usage():
-    print "Usage: python makeHistoryPlot.py --tag=[tag] --year=[year] (and/or --runBased)"
-    print "Usage: python makeHistoryPlot.py --inList=[inList] (--epoch=[epoch] and/or --absTime and/or --runBased)"
+    print "Usage: python makeHistoryPlot.py --tag=[tag] --year=[year] (and/or --runBased and/or --noEEForward)"
+    print "Usage: python makeHistoryPlot.py --inList=[inList] (--epoch=[epoch] and/or --absTime and/or --runBased and/or --noEEForward)"
     
 try:
-     opts, args = getopt.getopt(sys.argv[1:], "t:y:i:e:arh", ["tag=","year=","inList=","epoch=","absTime","runBased","help"])
+     opts, args = getopt.getopt(sys.argv[1:], "t:y:i:e:arnh", ["tag=","year=","inList=","epoch=","absTime","runBased","noEEForward","help"])
 
 except getopt.GetoptError:
      #* print help information and exit:*
@@ -26,6 +26,8 @@ inList = ""
 absTime = False
 runBased = False
 help = False
+noEEForward = False
+
 for opt, arg in opts:
     
      if opt in ("--tag"):
@@ -39,7 +41,9 @@ for opt, arg in opts:
      if opt in ("--absTime"):
         absTime = True   
      if opt in ("--runBased"):
-        runBased = True   
+        runBased = True 
+     if opt in ("--noEEForward"):
+        noEEForward = True   
      if opt in ("--help"):
         help = True     
 
@@ -62,9 +66,32 @@ if(inList != ""):
 if(absTime == True):
    print "absTime      = ",absTime 
 if(runBased == True):
-   print "runBased     = ",runBased  
+   print "runBased     = ",runBased 
+if(noEEForward == True):
+   print "noEEForward  = ",noEEForward
+ 
 
 #gStyle.SetOptStat(0)
+
+print "---- Reading EE rings ----"
+
+ringMap = [[[0 for k in xrange(101)] for j in xrange(101)] for i in xrange(2)]
+
+with open("eerings.dat") as f_EErings:
+        data_EErings = f_EErings.read()
+lines_EErings = data_EErings.splitlines() 
+for pos,x in enumerate(lines_EErings):
+    if(x == ""): 
+       continue
+    lines_EErings_split = x.split()
+    lines_EErings_split[0] = lines_EErings_split[0].replace("(", "")
+    lines_EErings_split[0] = lines_EErings_split[0].replace(",", "")
+    lines_EErings_split[1] = lines_EErings_split[1].replace(",", "")
+    lines_EErings_split[2] = lines_EErings_split[2].replace(")", "")
+    lines_EErings_split[2] = lines_EErings_split[2].replace(",", "")
+    if(int(int(lines_EErings_split[2]))<0):
+       lines_EErings_split[2] = "0"
+    ringMap[int(lines_EErings_split[2])][int(lines_EErings_split[1])][int(lines_EErings_split[0])] = int(lines_EErings_split[3])
 
 g_EBMinus = TGraphErrors()
 g_EBPlus = TGraphErrors()
@@ -96,13 +123,13 @@ if(inList != ""):
             if(runBased == True):
                interCalib_run = lines_interCalib_split[len(lines_interCalib_split)-2].split("_")
                date = float(interCalib_run[0])
-            calibFromXML(lines_interCalib[pos], date, icount, timeStamp_list, timeStamp_point, allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus, runBased)
+            calibFromXML(lines_interCalib[pos], date, icount, timeStamp_list, timeStamp_point, allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus, runBased, ringMap, noEEForward)
          if(interCalib_time[3].find(".dat") != -1):
             date = interCalib_time[3].replace(".dat", "")+"/"+interCalib_time[2]+"/"+interCalib_time[1]
             if(runBased == True):
                interCalib_run = lines_interCalib_split[len(lines_interCalib_split)-2].split("_")
                date = float(interCalib_run[0])   
-            calibFromDAT(lines_interCalib[pos], date, icount, timeStamp_list, timeStamp_point,allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus, runBased)
+            calibFromDAT(lines_interCalib[pos], date, icount, timeStamp_list, timeStamp_point,allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus, runBased, ringMap, noEEForward )
 
 else:
    #dump IOVs xml
@@ -121,7 +148,7 @@ else:
                print x
                icount = icount+1
                command = os.system("conddb dump "+ str(line_IOVs_split[5]) +" > dump_tmp")
-               calibFromXML("dump_tmp", date, icount, timeStamp_list, timeStamp_point, allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus, runBased)
+               calibFromXML("dump_tmp", date, icount, timeStamp_list, timeStamp_point, allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus, runBased, ringMap, noEEForward)
 
 if(runBased == True):
    timeStamp_begin = timeStamp_point[0]
@@ -229,21 +256,25 @@ if(runBased == False):
    test.GetXaxis().SetTitleSize(0.05)
    test.GetXaxis().SetTitleFont(42)
 else:
-   #timeStamp_tmp=[]
-   #timeStamp_tmp.append("10/10")
-   #timeStamp_tmp.append("10/10 (15 GeV)")
-   #timeStamp_tmp.append("10/10 (20 GeV)")
-   #timeStamp_tmp.append("11/10")
-   #timeStamp_tmp.append("11/10 (10 GeV)")
-   #timeStamp_tmp.append("11/10 (15 GeV)")
-   #timeStamp_tmp.append("11/10 (20 GeV)")
-   #timeStamp_tmp.append("11/10 (old Ped)")
-   #timeStamp_tmp.append("11/10 (old PS)")
-   #timeStamp_tmp.append("11/10 (old Ped&PS)")
-   #for pos,x in enumerate(timeStamp_tmp):
-   for pos,x in enumerate(timeStamp_list):
-      test.GetXaxis().SetBinLabel(pos+1,str(int(x)));
-      #test.GetXaxis().SetBinLabel(pos+1,str(x));
+   timeStamp_tmp=[]
+   timeStamp_tmp.append("10/10")
+   timeStamp_tmp.append("10/10 (15 GeV)")
+   timeStamp_tmp.append("10/10 (20 GeV)")
+   timeStamp_tmp.append("10/10 (25 GeV)")
+   timeStamp_tmp.append("10/10 (30 GeV)")   
+   timeStamp_tmp.append("11/10")
+   timeStamp_tmp.append("11/10 (10 GeV)")
+   timeStamp_tmp.append("11/10 (15 GeV)")
+   timeStamp_tmp.append("11/10 (20 GeV)")
+   timeStamp_tmp.append("11/10 (25 GeV)")
+   timeStamp_tmp.append("11/10 (30 GeV)")
+   timeStamp_tmp.append("11/10 (old Ped)")
+   timeStamp_tmp.append("11/10 (old PS)")
+   timeStamp_tmp.append("11/10 (old Ped&PS)")
+   for pos,x in enumerate(timeStamp_tmp):
+   #for pos,x in enumerate(timeStamp_list):
+      #test.GetXaxis().SetBinLabel(pos+1,str(int(x)));
+      test.GetXaxis().SetBinLabel(pos+1,str(x));
       #test.GetXaxis().LabelsOption("v")
       test.GetXaxis().SetLabelFont(42)
       test.GetXaxis().SetLabelOffset(0.005)
@@ -358,12 +389,16 @@ g_EBPlus.Draw("P,same")
 g_EEMinus.Draw("P,same")
 g_EEPlus.Draw("P,same")
 leg.Draw("same")
-if(absTime == False):
-   c1.SaveAs("Timing_History_"+str(year)+str(epoch)+".png","png")
-   c1.SaveAs("Timing_History_"+str(year)+str(epoch)+".pdf","pdf") 
-else:
+
+if(absTime == True):
    c1.SaveAs("Timing_History_"+str(year)+str(epoch)+"_abs.png","png")
    c1.SaveAs("Timing_History_"+str(year)+str(epoch)+"_abs.pdf","pdf") 
+elif(noEEForward == True):
+   c1.SaveAs("Timing_History_"+str(year)+str(epoch)+"_noEEForward.png","png")
+   c1.SaveAs("Timing_History_"+str(year)+str(epoch)+"_noEEForward.pdf","pdf") 
+else:
+   c1.SaveAs("Timing_History_"+str(year)+str(epoch)+".png","png")
+   c1.SaveAs("Timing_History_"+str(year)+str(epoch)+".pdf","pdf") 
 if(inList == ""): 
    command = os.system("rm IOVs_tmp")
    command = os.system("rm dump_tmp")

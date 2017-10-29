@@ -25,7 +25,7 @@ def computeError (calib_err) :
    error = 1./math.sqrt(error)
    return error    
 
-def calibFromXML (inFile, date, icount, timeStamp_list, timeStamp_point, allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus, runBased) : 
+def calibFromXML (inFile, date, icount, timeStamp_list, timeStamp_point, allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus, runBased, ringMap, noEEForward) : 
    if(inFile.find("#") != -1):
       return
    with open(inFile) as f_dump:
@@ -73,7 +73,7 @@ def calibFromXML (inFile, date, icount, timeStamp_list, timeStamp_point, allCali
       g_EEMinus.SetPoint(icount-1,timeStamp,EE_m_mean)
       g_EEPlus.SetPoint(icount-1,timeStamp,EE_p_mean) 
 
-def calibFromDAT (inFile, date, icount, timeStamp_list, timeStamp_point, allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus, runBased) : 
+def calibFromDAT (inFile, date, icount, timeStamp_list, timeStamp_point, allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus, runBased, ringMap, noEEForward) : 
    if(inFile.find("#") != -1):
       return
    with open(inFile) as f_dump:
@@ -91,7 +91,15 @@ def calibFromDAT (inFile, date, icount, timeStamp_list, timeStamp_point, allCali
       for pos2,x2 in enumerate(lines_dump):
          calib = x2.split()
          if(calib[3] == "nan" or calib[3] == "-nan"):
-            calib[3] = 0.
+            continue
+         iz = 1
+         if(int(calib[2]) == -1):
+            iz = 0
+         ring = 0
+         if(noEEForward == True and int(calib[2]) != 0):
+            ring = ringMap[iz][int(calib[1])][int(calib[0])]
+         if(noEEForward == True and int(calib[2]) != 0 and ring > 28):
+            continue
          if(float(calib[0])<0. and float(calib[2]) == 0.): 
             EB_minus.append(float(calib[3]))
             EB_error_minus.append(float(calib[4])/math.sqrt(int(calib[5])))
