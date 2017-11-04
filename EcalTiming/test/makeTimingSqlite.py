@@ -63,6 +63,9 @@ if(inList != ""):
          runs = lines_interCalib_split[len(lines_interCalib_split)-2].split("_")
          firstRun = runs[0]
          output = x.replace(".xml", ".db")
+         if os.path.isfile(str(output)):
+            print "WARNING: overwriting ",output
+            command = os.system("rm "+str(output))
          command=os.system("cmsRun ../../../CondTools/Ecal/python/testEcalTimeCalib.py xmlFile="+str(x)+" sqliteFile="+str(output)+" firstRun="+str(firstRun)+" tag="+str(tag))
          creation_command = "conddb_import -f sqlite_file:"+str(output)+" -i "+str(tag)+" -c sqlite_file:"+str(tag)+"_rereco_calib.db -t "+str(tag)+" -b "+str(firstRun)+"\n"
          f_tag.write(creation_command)
@@ -71,6 +74,9 @@ else:
    runs = calib_split[len(calib_split)-2].split("_")
    firstRun = runs[0]
    output = calib.replace(".xml", ".db")
+   if os.path.isfile(str(output)):
+      print "WARNING: overwriting ",output
+      command = os.system("rm "+str(output))
    command=os.system("cmsRun ../../../CondTools/Ecal/python/testEcalTimeCalib.py xmlFile="+str(calib)+" sqliteFile="+str(output)+" firstRun="+str(firstRun)+" tag="+str(tag))
    creation_command = "conddb_import -f sqlite_file:"+str(output)+" -i "+str(tag)+" -c sqlite_file:"+str(tag)+"_rereco_calib.db -t "+str(tag)+" -b "+str(firstRun)
    os.system(creation_command)

@@ -8,10 +8,10 @@ from historyPlot_utils import calibFromDAT
 
 def usage():
     print "Usage: python makeHistoryPlot.py --tag=[tag] --year=[year] (and/or --runBased and/or --noEEForward)"
-    print "Usage: python makeHistoryPlot.py --inList=[inList] (--epoch=[epoch] and/or --absTime and/or --runBased and/or --noEEForward)"
+    print "Usage: python makeHistoryPlot.py --inList=[inList] (--epoch=[epoch] and/or --ix=[ix] and/or --iy=[iy] and/or --iz=[iz] and/or --absTime and/or --runBased and/or --noEEForward)"
     
 try:
-     opts, args = getopt.getopt(sys.argv[1:], "t:y:i:e:arnh", ["tag=","year=","inList=","epoch=","absTime","runBased","noEEForward","help"])
+     opts, args = getopt.getopt(sys.argv[1:], "t:y:i:e:x:y:z:arnh", ["tag=","year=","inList=","epoch=","ix=","iy=","iz=","absTime","runBased","noEEForward","help"])
 
 except getopt.GetoptError:
      #* print help information and exit:*
@@ -23,6 +23,9 @@ tag = ""
 year = ""
 epoch = ""
 inList = ""
+ix = ""
+iy = ""
+iz = ""
 absTime = False
 runBased = False
 help = False
@@ -38,6 +41,12 @@ for opt, arg in opts:
         epoch = arg
      if opt in ("--inList"):
         inList = arg  
+     if opt in ("--ix"):
+        ix = arg  
+     if opt in ("--iy"):
+        iy = arg  
+     if opt in ("--iz"):
+        iz = arg  
      if opt in ("--absTime"):
         absTime = True   
      if opt in ("--runBased"):
@@ -63,6 +72,12 @@ if(epoch != ""):
    print "epoch        = ",epoch
 if(inList != ""):
    print "inList       = ",inList  
+if(ix != ""):
+   print "ix           = ",ix 
+if(iy != ""):
+   print "iy           = ",iy 
+if(iz != ""):
+   print "iz           = ",iz 
 if(absTime == True):
    print "absTime      = ",absTime 
 if(runBased == True):
@@ -72,6 +87,46 @@ if(noEEForward == True):
  
 
 #gStyle.SetOptStat(0)
+
+#make crystal maps
+print "---- Making crystal maps ----"
+
+crystals_EB=collections.OrderedDict()
+crystals_EE=collections.OrderedDict()
+pos_EB=collections.OrderedDict()
+pos_EE=collections.OrderedDict()
+rawId_EB=collections.OrderedDict()
+rawId_EE=collections.OrderedDict()
+timeIntercalib_EB=collections.OrderedDict()
+timeIntercalib_EE=collections.OrderedDict()
+ieta_EB=collections.OrderedDict()
+iphi_EB=collections.OrderedDict()
+ix_EE=collections.OrderedDict()
+iy_EE=collections.OrderedDict()
+iz_EE=collections.OrderedDict()
+
+with open("EB_crystals.txt") as f_cryEB:
+        data_cryEB = f_cryEB.read()
+lines_cryEB = data_cryEB.splitlines() 
+for pos,x in enumerate(lines_cryEB):
+    lines_cryEB_split = x.split()
+    crystals_EB[lines_cryEB_split[0]]=bool(False)
+    pos_EB[pos]=lines_cryEB_split[0]
+    rawId_EB[lines_cryEB_split[0]]=pos
+    ieta_EB[lines_cryEB_split[0]] = lines_cryEB_split[4]
+    iphi_EB[lines_cryEB_split[0]] = lines_cryEB_split[3]
+   
+with open("EE_crystals.txt") as f_cryEE:
+        data_cryEE = f_cryEE.read()
+lines_cryEE = data_cryEE.splitlines() 
+for pos,x in enumerate(lines_cryEE):
+    lines_cryEE_split = x.split()
+    crystals_EE[lines_cryEE_split[0]]=bool(False)
+    pos_EE[pos]=lines_cryEE_split[0]
+    rawId_EE[lines_cryEE_split[0]]=pos
+    ix_EE[lines_cryEE_split[0]] = lines_cryEE_split[4]
+    iy_EE[lines_cryEE_split[0]] = lines_cryEE_split[5]
+    iz_EE[lines_cryEE_split[0]] = lines_cryEE_split[3]
 
 print "---- Reading EE rings ----"
 
@@ -123,13 +178,13 @@ if(inList != ""):
             if(runBased == True):
                interCalib_run = lines_interCalib_split[len(lines_interCalib_split)-2].split("_")
                date = float(interCalib_run[0])
-            calibFromXML(lines_interCalib[pos], date, icount, timeStamp_list, timeStamp_point, allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus, runBased, ringMap, noEEForward)
+            calibFromXML(lines_interCalib[pos], date, icount, timeStamp_list, timeStamp_point, allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus, runBased, ringMap, noEEForward, ix, iy, iz, pos_EB, ieta_EB, iphi_EB, pos_EE, ix_EE, iy_EE, iz_EE)
          if(interCalib_time[3].find(".dat") != -1):
             date = interCalib_time[3].replace(".dat", "")+"/"+interCalib_time[2]+"/"+interCalib_time[1]
             if(runBased == True):
                interCalib_run = lines_interCalib_split[len(lines_interCalib_split)-2].split("_")
                date = float(interCalib_run[0])   
-            calibFromDAT(lines_interCalib[pos], date, icount, timeStamp_list, timeStamp_point,allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus, runBased, ringMap, noEEForward )
+            calibFromDAT(lines_interCalib[pos], date, icount, timeStamp_list, timeStamp_point,allCalib_list, g_EBMinus, g_EBPlus, g_EEMinus, g_EEPlus, runBased, ringMap, noEEForward, ix, iy, iz)
 
 else:
    #dump IOVs xml
@@ -160,6 +215,9 @@ else:
 allCalib_list.sort()
 y_min = allCalib_list[0]-0.05
 y_max = allCalib_list[len(allCalib_list)-1]+0.3
+if(ix != "" and iy != "" and iz != ""):
+   y_min = allCalib_list[0]-1.
+   y_max = allCalib_list[len(allCalib_list)-1]+1.
 
 g_EBMinus.SetMarkerColor(600)
 g_EBMinus.SetLineColor(600)
@@ -384,21 +442,38 @@ if(runBased == False):
       line_IOV5_calib.Draw("same")
    if(float(timeStamp_begin-0.001e+9)<=1507161600. and float(timeStamp_end+0.001e+9)>=1507161600.):
       line_IOV5_in.Draw("same")
-g_EBMinus.Draw("P,same")
-g_EBPlus.Draw("P,same")
-g_EEMinus.Draw("P,same")
-g_EEPlus.Draw("P,same")
-leg.Draw("same")
+if(ix != "" and iy != "" and iz != ""):
+   g_EBMinus.Draw("P,same")
+elif(ix == "" and iy == "" and iz == ""):
+   g_EBMinus.Draw("P,same")
+   g_EBPlus.Draw("P,same")
+   g_EEMinus.Draw("P,same")
+   g_EEPlus.Draw("P,same")
+   leg.Draw("same")
 
 if(absTime == True):
-   c1.SaveAs("Timing_History_"+str(year)+str(epoch)+"_abs.png","png")
-   c1.SaveAs("Timing_History_"+str(year)+str(epoch)+"_abs.pdf","pdf") 
-elif(noEEForward == True):
-   c1.SaveAs("Timing_History_"+str(year)+str(epoch)+"_noEEForward.png","png")
-   c1.SaveAs("Timing_History_"+str(year)+str(epoch)+"_noEEForward.pdf","pdf") 
+   if(ix == "" and iy == "" and iz == ""):
+      if(noEEForward == True):
+         c1.SaveAs("Timing_History_"+str(year)+str(epoch)+"_noEEForward_abs.png","png")
+         c1.SaveAs("Timing_History_"+str(year)+str(epoch)+"_noEEForward_abs.pdf","pdf") 
+      else:
+         c1.SaveAs("Timing_History_"+str(year)+str(epoch)+"_abs.png","png")
+         c1.SaveAs("Timing_History_"+str(year)+str(epoch)+"_abs.pdf","pdf") 
+   elif(ix != "" and iy != "" and iz != ""):
+      c1.SaveAs("Timing_History_"+str(year)+str(epoch)+"_Crystal_"+ix+"_"+iy+"_"+iz+"_abs.png","png")
+      c1.SaveAs("Timing_History_"+str(year)+str(epoch)+"_Crystal_"+ix+"_"+iy+"_"+iz+"_abs.pdf","pdf") 
 else:
-   c1.SaveAs("Timing_History_"+str(year)+str(epoch)+".png","png")
-   c1.SaveAs("Timing_History_"+str(year)+str(epoch)+".pdf","pdf") 
+   if(ix == "" and iy == "" and iz == ""):
+      if(noEEForward == True):
+         c1.SaveAs("Timing_History_"+str(year)+str(epoch)+"_noEEForward.png","png")
+         c1.SaveAs("Timing_History_"+str(year)+str(epoch)+"_noEEForward.pdf","pdf") 
+      else:
+         c1.SaveAs("Timing_History_"+str(year)+str(epoch)+".png","png")
+         c1.SaveAs("Timing_History_"+str(year)+str(epoch)+".pdf","pdf") 
+   elif(ix != "" and iy != "" and iz != ""):
+      c1.SaveAs("Timing_History_"+str(year)+str(epoch)+"_Crystal_"+ix+"_"+iy+"_"+iz+".png","png")
+      c1.SaveAs("Timing_History_"+str(year)+str(epoch)+"_Crystal_"+ix+"_"+iy+"_"+iz+".pdf","pdf") 
+
 if(inList == ""): 
    command = os.system("rm IOVs_tmp")
    command = os.system("rm dump_tmp")
