@@ -301,3 +301,51 @@ def makeAbsTimingXML(calib, timeIntercalib_EB, timeIntercalib_EE, pos_EB, pos_EE
           f_tag.write(x_abs)
    f_tag.close()
 
+def calibCompareXML (IOV, inFile1, inFile2, h_diff_EB, h_diff_EE, onlyEB, onlyEE) : 
+
+   EB_1 = []
+   EE_1 = []
+   EB_2 = []
+   EE_2 = []
+   EB_diff = []
+   EE_diff = []
+
+   with open(inFile1) as f_dump:
+      data_dump = f_dump.read()
+      lines_dump = data_dump.splitlines()  
+      for pos2,x2 in enumerate(lines_dump):
+         x2 = x2.replace("<item>", "")
+         x2 = x2.replace("</item>", "")
+         if(pos2>7 and pos2<61208): 
+            EB_1.append(float(x2))
+         if(pos2>61213 and pos2<75862): 
+            EE_1.append(float(x2))
+
+   with open(inFile2) as f_dump:
+      data_dump = f_dump.read()
+      lines_dump = data_dump.splitlines()  
+      for pos2,x2 in enumerate(lines_dump):
+         x2 = x2.replace("<item>", "")
+         x2 = x2.replace("</item>", "")
+         if(pos2>7 and pos2<61208): 
+            EB_2.append(float(x2))
+         if(pos2>61213 and pos2<75862): 
+            EE_2.append(float(x2))
+   
+   for pos,x in enumerate(EB_1):
+      EB_diff.append(EB_1[pos]-EB_2[pos])
+      h_diff_EB.Fill(EB_1[pos]-EB_2[pos])
+   for pos,x in enumerate(EE_1):
+      EE_diff.append(EE_1[pos]-EE_2[pos])
+      h_diff_EE.Fill(EE_1[pos]-EE_2[pos])
+   
+   EB_mean = float(sum(EB_diff))/len(EB_diff) 
+   EE_mean = float(sum(EE_diff))/len(EE_diff) 
+
+   if(onlyEB == False and onlyEE == False):
+      print IOV,": <EB diff> = ",EB_mean,", <EE diff> = ",EE_mean  
+   elif(onlyEE == False):
+      print IOV,": <EB diff> = ",EB_mean 
+   elif(onlyEB == False):
+      print IOV,": <EE diff> = ",EE_mean 
+ 
