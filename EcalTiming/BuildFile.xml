@@ -17,7 +17,6 @@
 <use   name="MagneticField/Engine"/>
 <use   name="MagneticField/Records"/>
 <use   name="FWCore/PluginManager"/>
-
 <use   name="DataFormats/EgammaCandidates"/>
 <use   name="DataFormats/DetId"/>
 <use   name="hepmc"/>

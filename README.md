@@ -3,14 +3,13 @@ EcalTiming
 
 1) Install:
 
-    * scram project CMSSW_9_0_0
-    * cd CMSSW_9_0_0
+    * scram project CMSSW_10_0_3
+    * cd CMSSW_10_0_3
     * cmsenv
-    * git cms-merge-topic previsualconsent:iRingSubdet804
     * git cms-addpkg CondTools/Ecal
     * git clone  git@github.com:bmarzocc/EcalTiming.git
     * cd EcalTiming
-    * git checkout Run2017
+    * git checkout Run2018
     * cd -
     * cp EcalTiming/EcalTiming/interface/EcalFloatCondObjectContainerXMLTranslator.h CondTools/Ecal/interface/
     * rm EcalTiming/EcalTiming/interface/EcalFloatCondObjectContainerXMLTranslator.h
