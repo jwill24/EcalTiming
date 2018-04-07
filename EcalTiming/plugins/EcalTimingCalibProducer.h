@@ -73,7 +73,7 @@
 // input collections
 #include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
 //RingTools
-#include "Calibration/Tools/interface/EcalRingCalibrationTools.h"
+#include "EcalTiming/EcalTiming/interface/EcalRingCalibrationTools.h"
 #include "Geometry/CaloGeometry/interface/CaloGeometry.h"
 #include "Geometry/CaloGeometry/interface/CaloSubdetectorGeometry.h"
 #include "Geometry/Records/interface/CaloGeometryRecord.h"
