@@ -72,7 +72,7 @@ for($index=0;$index<=$#runs;$index++)
  $LISTOFSamples = "fileList.txt";
  $command = "touch ".$LISTOFSamples ;
  system ($command) ;
- system ("python ./das_client.py --query='file dataset=".$DATASETName." run=".$RUNNumber."' --limit=0 >> fileList.txt \n") ;
+ system ("dasgoclient --query='file dataset=".$DATASETName." run=".$RUNNumber."' --limit=0 >> fileList.txt \n") ;
   
  open (LISTOFSamples,$LISTOFSamples) ;
  while (<LISTOFSamples>)
@@ -180,7 +180,7 @@ for($index=0;$index<=$#runs;$index++)
         $command = "eos mkdir ".$OUTPUTSAVEPath."/".$JOBdir;
 	print SAMPLEJOBFILE $command."\n";
 
-	$command = "eos cp ".$OUTPUTFILEName."_".$jobIt.".root root://eoscms.cern.ch/".$OUTPUTSAVEPath."/".$JOBdir."/";
+	$command = "cp ".$OUTPUTFILEName."_".$jobIt.".root /eos/cms/".$OUTPUTSAVEPath."/".$JOBdir."/";
 	print SAMPLEJOBFILE $command."\n";
 
         $command = "rm ".$OUTPUTFILEName."_".$jobIt.".root";

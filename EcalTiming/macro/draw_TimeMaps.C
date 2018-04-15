@@ -22,18 +22,18 @@ float getMean(TProfile2D* p2);
 void draw_TimeMaps() {
   
   gStyle->SetOptStat(0);
-
+  gROOT->SetBatch(kTRUE);
   // inputs
-  TFile* inFile = TFile::Open("../output/ecalTiming_prova.root");
+  TFile* inFile = TFile::Open("/eos/cms/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Commissioning2018/Calibration/314093_314094/ecalTiming.root");
   
   TProfile2D* t2_TimeMap_EB = (TProfile2D*)inFile->Get("TimeMapEB");
-  t2_TimeMap_EB->GetZaxis()->SetRangeUser(-1.5,0.8);
+  t2_TimeMap_EB->GetZaxis()->SetRangeUser(-0.3,2.7);
   
   TProfile2D* t2_TimeMap_EEP = (TProfile2D*)inFile->Get("TimeMapEEP");
-  t2_TimeMap_EEP->GetZaxis()->SetRangeUser(-1.5,0.8);
+  t2_TimeMap_EEP->GetZaxis()->SetRangeUser(-0.3,1.7);
 
   TProfile2D* t2_TimeMap_EEM = (TProfile2D*)inFile->Get("TimeMapEEM");
-  t2_TimeMap_EEM->GetZaxis()->SetRangeUser(-1.5,0.8);
+  t2_TimeMap_EEM->GetZaxis()->SetRangeUser(-0.3,1.7);
 
   TProfile2D* t2_RingTimeMap_EB = (TProfile2D*)inFile->Get("RingTimeMapEB");
   TProfile2D* t2_RingTimeMap_EEP = (TProfile2D*)inFile->Get("RingTimeMapEEP");
@@ -223,21 +223,21 @@ void draw_TimeMaps() {
   gStyle->SetOptStat(1);
 
   h1_RechitTimeEB->Rebin(10);
-  h1_RechitTimeEB->GetXaxis()->SetRangeUser(-2.,2.);
+  h1_RechitTimeEB->GetXaxis()->SetRangeUser(-3.,3.);
   TCanvas* c22 = new TCanvas("c22","c22",1);
   h1_RechitTimeEB->Draw(); 
   c22->SaveAs("Time_EB.png","png");
   c22->SaveAs("Time_EB.pdf","pdf");
 
   h1_RechitTimeEEP->Rebin(10);
-  h1_RechitTimeEEP->GetXaxis()->SetRangeUser(-2.,2.);
+  h1_RechitTimeEEP->GetXaxis()->SetRangeUser(-3.,3.);
   TCanvas* c23 = new TCanvas("c23","c23",1);
   h1_RechitTimeEEP->Draw(); 
   c23->SaveAs("Time_EEP.png","png");
   c23->SaveAs("Time_EEP.pdf","pdf");
 
   h1_RechitTimeEEM->Rebin(10);
-  h1_RechitTimeEEM->GetXaxis()->SetRangeUser(-2.,2.);
+  h1_RechitTimeEEM->GetXaxis()->SetRangeUser(-3.,3.);
   TCanvas* c24 = new TCanvas("c24","c24",1);
   h1_RechitTimeEEM->Draw(); 
   c24->SaveAs("Time_EEM.png","png");

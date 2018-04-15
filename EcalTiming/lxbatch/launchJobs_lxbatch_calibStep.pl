@@ -126,13 +126,13 @@ print SAMPLEJOBFILE $command."\n";
 $command = "cd output" ;
 print SAMPLEJOBFILE $command."\n";
 
-$command = "eos cp ecalTiming.dat root://eoscms.cern.ch/".$OUTDir."/";
+$command = "cp ecalTiming.dat /eos/cms/".$OUTDir."/";
 print SAMPLEJOBFILE $command."\n";
 
-$command = "eos cp ecalTiming-corr.dat root://eoscms.cern.ch/".$OUTDir."/";
+$command = "cp ecalTiming-corr.dat /eos/cms/".$OUTDir."/";
 print SAMPLEJOBFILE $command."\n";
 
-$command = "eos cp ecalTiming.root root://eoscms.cern.ch/".$OUTDir."/";
+$command = "cp ecalTiming.root /eos/cms/".$OUTDir."/";
 print SAMPLEJOBFILE $command."\n";
 	
 ############
