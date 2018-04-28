@@ -91,6 +91,9 @@ rawId_EB=collections.OrderedDict()
 rawId_EE=collections.OrderedDict()
 timeIntercalib_EB=collections.OrderedDict()
 timeIntercalib_EE=collections.OrderedDict()
+ix=collections.OrderedDict()
+iy=collections.OrderedDict()
+iz=collections.OrderedDict()
 
 with open("EB_crystals.txt") as f_cryEB:
         data_cryEB = f_cryEB.read()
@@ -100,6 +103,9 @@ for pos,x in enumerate(lines_cryEB):
     crystals_EB[lines_cryEB_split[0]]=bool(False)
     pos_EB[pos]=lines_cryEB_split[0]
     rawId_EB[lines_cryEB_split[0]]=pos
+    ix[lines_cryEB_split[0]]=lines_cryEB_split[4]
+    iy[lines_cryEB_split[0]]=lines_cryEB_split[3]
+    iz[lines_cryEB_split[0]]="0"
    
 with open("EE_crystals.txt") as f_cryEE:
         data_cryEE = f_cryEE.read()
@@ -109,6 +115,9 @@ for pos,x in enumerate(lines_cryEE):
     crystals_EE[lines_cryEE_split[0]]=bool(False)
     pos_EE[pos]=lines_cryEE_split[0]
     rawId_EE[lines_cryEE_split[0]]=pos
+    ix[lines_cryEE_split[0]]=lines_cryEE_split[4]
+    iy[lines_cryEE_split[0]]=lines_cryEE_split[5]
+    iz[lines_cryEE_split[0]]=lines_cryEE_split[3]
 
 #Reading the calibration file
 print "---- Reading the calibration file ----"
@@ -147,7 +156,7 @@ if(calib == ""):
             print date," ---> ",IOVs_info[icount]
             line_IOVs_split = IOVs_info[icount].split()
             command = os.system("conddb dump "+ str(line_IOVs_split[5]) +" > dump_tmp")
-         makeAbsTimingXML(lines_interCalib[pos], timeIntercalib_EB, timeIntercalib_EE, pos_EB, pos_EE, crystals_EB, crystals_EE, str(output_absCalib))
+         makeAbsTimingXML(lines_interCalib[pos], timeIntercalib_EB, timeIntercalib_EE, pos_EB, pos_EE, crystals_EB, crystals_EE, ix, iy, iz, str(output_absCalib))
          f_absCalib.write(str(output_absCalib)+"\n")
       else:
          print "WARNING: wrong import format! Skipping this IOV"  
@@ -172,7 +181,7 @@ else:
          print date," ---> ",IOVs_info[icount]
          line_IOVs_split = IOVs_info[icount].split()
          command = os.system("conddb dump "+ str(line_IOVs_split[5]) +" > dump_tmp")
-      makeAbsTimingXML(calib, timeIntercalib_EB, timeIntercalib_EE, pos_EB, pos_EE, crystals_EB, crystals_EE, output_absCalib)
+      makeAbsTimingXML(calib, timeIntercalib_EB, timeIntercalib_EE, pos_EB, pos_EE, crystals_EB, crystals_EE, ix, iy, iz, output_absCalib)
       print "---> Absolute Timing file produced: ",output_absCalib
    else:
       print "WARNING: wrong import format! Skipping this IOV"  
