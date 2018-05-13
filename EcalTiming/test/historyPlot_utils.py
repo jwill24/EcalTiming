@@ -245,7 +245,7 @@ def calibFromDAT (inFile, date, icount, timeStamp_list, timeStamp_point, allCali
          g_EBMinus.SetPoint(icount-1,timeStamp,float(crystal_mean))
          g_EBMinus.SetPointError(icount-1,0,float(crystal_error))
 
-def makeAbsTimingXML(calib, timeIntercalib_EB, timeIntercalib_EE, pos_EB, pos_EE, crystals_EB, crystals_EE, output) :
+def makeAbsTimingXML(calib, timeIntercalib_EB, timeIntercalib_EE, pos_EB, pos_EE, crystals_EB, crystals_EE,ix,iy,iz, output) :
    with open(str(calib)) as f_interCalib:
       data_interCalib = f_interCalib.read()
    lines_interCalib = data_interCalib.splitlines() 
@@ -282,21 +282,29 @@ def makeAbsTimingXML(calib, timeIntercalib_EB, timeIntercalib_EE, pos_EB, pos_EE
        elif(pos>=8 and pos<=61207): 
           x = x.replace("<item>", "")
           x = x.replace("</item>", "")
-          if(crystals_EB[pos_EB[pos-8]] == True):
-             x = float(x)-float(timeIntercalib_EB[pos_EB[pos-8]]) 
+          if(abs(float(x))>10.):
+             print "WARNING: ",ix[pos_EB[pos-8]],iy[pos_EB[pos-8]],iz[pos_EB[pos-8]],x,"---> Setting timing to 0!" 
+             x = "0."
           else:
-             x = float(x) 
-          x = "{:.9e}".format(x)
+             if(crystals_EB[pos_EB[pos-8]] == True):
+                x = float(x)-float(timeIntercalib_EB[pos_EB[pos-8]]) 
+             else:
+                x = float(x) 
+             x = "{:.9e}".format(x)
           x_abs = "			<item>"+str(x)+"</item> \n"
           f_tag.write(x_abs)
        elif(pos>=61214 and pos<=75861):
           x = x.replace("<item>", "")
           x = x.replace("</item>", "")
-          if(crystals_EE[pos_EE[pos-61214]] == True):
-             x = float(x)-float(timeIntercalib_EE[pos_EE[pos-61214]]) 
+          if(abs(float(x))>10.):
+             print "WARNING: ",ix[pos_EE[pos-61214]],iy[pos_EE[pos-61214]],iz[pos_EE[pos-61214]],x,"---> Setting timing to 0!" 
+             x = "0."
           else:
-             x = float(x) 
-          x = "{:.9e}".format(x)
+             if(crystals_EE[pos_EE[pos-61214]] == True):
+                x = float(x)-float(timeIntercalib_EE[pos_EE[pos-61214]]) 
+             else:
+                x = float(x) 
+             x = "{:.9e}".format(x)
           x_abs = "			<item>"+str(x)+"</item> \n"
           f_tag.write(x_abs)
    f_tag.close()

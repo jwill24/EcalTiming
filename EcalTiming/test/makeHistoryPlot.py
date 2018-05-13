@@ -213,8 +213,8 @@ else:
    timeStamp_end = timeStamp_list[len(timeStamp_list)-1]
 
 allCalib_list.sort()
-y_min = allCalib_list[0]-0.05
-y_max = allCalib_list[len(allCalib_list)-1]+0.3
+y_min = allCalib_list[0]-0.1
+y_max = allCalib_list[len(allCalib_list)-1]+0.2
 if(ix != "" and iy != "" and iz != ""):
    y_min = allCalib_list[0]-1.
    y_max = allCalib_list[len(allCalib_list)-1]+1.
@@ -342,9 +342,10 @@ if(absTime == False):
 else:
    test.GetYaxis().SetTitle("Absolute Time [ns]")
 test.GetYaxis().SetLabelFont(42)
-test.GetYaxis().SetLabelOffset(0.007)
+#test.GetYaxis().SetLabelOffset(0.007)
 test.GetYaxis().SetLabelSize(0.05)
 test.GetYaxis().SetTitleSize(0.05)
+test.GetYaxis().SetTitleOffset(0.8)
 test.GetYaxis().SetTitleFont(42)
 test.GetYaxis().SetLabelFont(42)
 test.GetYaxis().SetRangeUser(float(y_min),float(y_max))
