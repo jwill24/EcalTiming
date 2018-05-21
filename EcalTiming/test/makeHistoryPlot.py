@@ -362,87 +362,38 @@ leg.AddEntry(g_EEMinus, "EE-", "P")
 leg.AddEntry(g_EEPlus, "EE+", "P")
 
 #Prompt IOVS
-line_IOV1_calib = TLine(1494460800,float(y_min),1494460800,float(y_max))
-line_IOV1_calib.SetLineColor(633)
-line_IOV1_calib.SetLineStyle(8)
-line_IOV1_calib.SetLineWidth(2)
-
-line_IOV1_inBad = TLine(1494806400,float(y_min),1494806400,float(y_max))
-line_IOV1_inBad.SetLineColor(880)
-line_IOV1_inBad.SetLineStyle(8)
-line_IOV1_inBad.SetLineWidth(2)
-
-line_IOV1_in = TLine(1496880000,float(y_min),1496880000,float(y_max))
+line_IOV1_in = TLine(1524182400,float(y_min),1524182400,float(y_max))
 line_IOV1_in.SetLineColor(417)
 line_IOV1_in.SetLineStyle(8)
 line_IOV1_in.SetLineWidth(2)
 
-line_IOV2_calib = TLine(1497744000,float(y_min),1497744000,float(y_max))
-line_IOV2_calib.SetLineColor(633)
-line_IOV2_calib.SetLineStyle(8)
-line_IOV2_calib.SetLineWidth(2)
-
-line_IOV2_in = TLine(1498780800,float(y_min),1498780800,float(y_max))
+line_IOV2_in = TLine(1524906384,float(y_min),1524906384,float(y_max))
 line_IOV2_in.SetLineColor(417)
 line_IOV2_in.SetLineStyle(8)
 line_IOV2_in.SetLineWidth(2)
 
-line_IOV3_calib = TLine(1500508800,float(y_min),1500508800,float(y_max))
-line_IOV3_calib.SetLineColor(633)
-line_IOV3_calib.SetLineStyle(8)
-line_IOV3_calib.SetLineWidth(2)
-
-line_IOV3_in = TLine(1501459200,float(y_min),1501459200,float(y_max))
+line_IOV3_in = TLine(1526403946,float(y_min),1526403946,float(y_max))
 line_IOV3_in.SetLineColor(417)
 line_IOV3_in.SetLineStyle(8)
 line_IOV3_in.SetLineWidth(2)
 
-line_IOV4_calib = TLine(1502064000,float(y_min),1502064000,float(y_max))
-line_IOV4_calib.SetLineColor(633)
-line_IOV4_calib.SetLineStyle(8)
-line_IOV4_calib.SetLineWidth(2)
-
-line_IOV4_in = TLine(1503273600,float(y_min),1503273600,float(y_max))
+line_IOV4_in = TLine(1526746800,float(y_min),1526746800,float(y_max))
 line_IOV4_in.SetLineColor(417)
 line_IOV4_in.SetLineStyle(8)
 line_IOV4_in.SetLineWidth(2)
-
-line_IOV5_calib = TLine(1506902400,float(y_min),1506902400,float(y_max))
-line_IOV5_calib.SetLineColor(633)
-line_IOV5_calib.SetLineStyle(8)
-line_IOV5_calib.SetLineWidth(2)
-
-line_IOV5_in = TLine(1507161600,float(y_min),1507161600,float(y_max))
-line_IOV5_in.SetLineColor(417)
-line_IOV5_in.SetLineStyle(8)
-line_IOV5_in.SetLineWidth(2)
   
 c1 = TCanvas("c1","c1",1)
 c1.SetGrid()
 test.Draw("H")
 if(runBased == False):
-   if(float(timeStamp_begin-0.001e+9)<=1494460800. and float(timeStamp_end+0.001e+9)>=1494460800.):
-      line_IOV1_calib.Draw("same")
-   if(float(timeStamp_begin-0.001e+9)<=1494806400. and float(timeStamp_end+0.001e+9)>=1494806400.):
-      line_IOV1_inBad.Draw("same")
-   if(float(timeStamp_begin-0.001e+9)<=1496880000. and float(timeStamp_end+0.001e+9)>=1496880000.):
+   if(float(timeStamp_begin-0.001e+9)<=1524182400. and float(timeStamp_end+0.001e+9)>=1524182400.):
       line_IOV1_in.Draw("same")
-   if(float(timeStamp_begin-0.001e+9)<=1497744000. and float(timeStamp_end+0.001e+9)>=1497744000.):
-      line_IOV2_calib.Draw("same")
-   if(float(timeStamp_begin-0.001e+9)<=1498780800. and float(timeStamp_end+0.001e+9)>=1498780800.):
+   if(float(timeStamp_begin-0.001e+9)<=1524906384. and float(timeStamp_end+0.001e+9)>=1524906384.):
       line_IOV2_in.Draw("same")
-   if(float(timeStamp_begin-0.001e+9)<=1500508800. and float(timeStamp_end+0.001e+9)>=1500508800.):
-      line_IOV3_calib.Draw("same")
-   if(float(timeStamp_begin-0.001e+9)<=1501459200. and float(timeStamp_end+0.001e+9)>=1501459200.):
+   if(float(timeStamp_begin-0.001e+9)<=1526403946. and float(timeStamp_end+0.001e+9)>=1526403946.):
       line_IOV3_in.Draw("same")
-   if(float(timeStamp_begin-0.001e+9)<=1502064000. and float(timeStamp_end+0.001e+9)>=1502064000.):
-      line_IOV4_calib.Draw("same")
-   if(float(timeStamp_begin-0.001e+9)<=1503273600. and float(timeStamp_end+0.001e+9)>=1503273600.):
-      line_IOV4_in.Draw("same")
-   if(float(timeStamp_begin-0.001e+9)<=1506902400. and float(timeStamp_end+0.001e+9)>=1506902400.):
-      line_IOV5_calib.Draw("same")
-   if(float(timeStamp_begin-0.001e+9)<=1507161600. and float(timeStamp_end+0.001e+9)>=1507161600.):
-      line_IOV5_in.Draw("same")
+   if(float(timeStamp_begin-0.001e+9)<=1526746800. and float(timeStamp_end+0.001e+9)>=1526746800.):
+      line_IOV4_in.Draw("same")  
 if(ix != "" and iy != "" and iz != ""):
    g_EBMinus.Draw("P,same")
 elif(ix == "" and iy == "" and iz == ""):
