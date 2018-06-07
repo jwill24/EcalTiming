@@ -79,13 +79,13 @@ def calibFromXML (inFile, date, icount, timeStamp_list, timeStamp_point, allCali
 
    #fill the graph
    if(ix == "" and iy == "" and iz == ""):
-      EB_p_mean = float(sum(EB_plus))/len(EB_plus)
+      EB_p_mean = float(sum(EB_plus))/len(EB_plus)-9.641680121e-01
       allCalib_list.append(float(EB_p_mean))
-      EB_m_mean = float(sum(EB_minus))/len(EB_minus)
+      EB_m_mean = float(sum(EB_minus))/len(EB_minus)-9.641680121e-01
       allCalib_list.append(float(EB_m_mean))
-      EE_p_mean = float(sum(EE_plus))/len(EE_plus)
+      EE_p_mean = float(sum(EE_plus))/len(EE_plus)+3.476650119e-01
       allCalib_list.append(float(EE_p_mean))
-      EE_m_mean = float(sum(EE_minus))/len(EE_minus)
+      EE_m_mean = float(sum(EE_minus))/len(EE_minus)+3.476650119e-01
       allCalib_list.append(float(EE_m_mean))
    elif(ix != "" and iy != "" and iz != ""):
       allCalib_list.append(float(crystal_mean))

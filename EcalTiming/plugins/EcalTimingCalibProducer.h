@@ -168,6 +168,9 @@ private:
 	double _minRecHitEnergyNStep; ///< number of steps to check energy stability
         double _energyThresholdOffsetEB; ///< energy to add to the minimum energy thresholc
         double _energyThresholdOffsetEE; ///< energy to add to the minimum energy thresholc
+        std::vector<double> _eThresholdsEB; ///< minimum energy thresholc in EB
+        std::vector<double> _parAThresholds_endcap; ///<B + A*ring 2018 thr are defined as two linear cut (one for iring<30 and one above)
+        std::vector<double> _parBThresholds_endcap; ///<B + A*ring 2018 thr are defined as two linear cut (one for iring<30 and one above)
 	unsigned int _minEntries; ///< require a minimum number of entries in a ring to do averages
 	float        _globalOffset;    ///< time to subtract from every event
         bool _storeEvents;
@@ -226,8 +229,19 @@ private:
            if(itr == _CrysEnergyMap.end())
            {
               int iRing = _ringTools.getRingIndexInSubdet(detid);
-              _CrysEnergyMap[detid] = detid.subdetId() == EcalBarrel ? 13 * 0.04  + _energyThresholdOffsetEB :  
-              20 * (79.29 - 4.148 * iRing + 0.2442 * iRing * iRing ) / 1000  + _energyThresholdOffsetEE;
+              if(detid.subdetId() == EcalBarrel)
+              {
+                 _CrysEnergyMap[detid] = 13*0.04 + _energyThresholdOffsetEB;
+                 //std::cout << "EB-" << iRing << ": " << _CrysEnergyMap[detid] << std::endl;
+                 //_CrysEnergyMap[detid] = _eThresholdsEB[iRing]  + _energyThresholdOffsetEB;
+              }else{
+                 if(iRing < 30)
+	            //_CrysEnergyMap[detid] = (_parBThresholds_endcap[0] + _parAThresholds_endcap[0]*iRing);
+                    _CrysEnergyMap[detid] = 20 * (79.29 - 4.148 * iRing + 0.2442 * iRing * iRing ) / 1000 + _energyThresholdOffsetEE;
+                 else
+                    _CrysEnergyMap[detid] = (_parBThresholds_endcap[1] + _parAThresholds_endcap[1]*iRing);
+                 //std::cout << "EE-" << iRing << ": " << _CrysEnergyMap[detid] << std::endl;
+              }
            }
            return _CrysEnergyMap[detid];
         }
