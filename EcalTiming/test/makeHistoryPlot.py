@@ -215,6 +215,8 @@ else:
 allCalib_list.sort()
 y_min = allCalib_list[0]-0.1
 y_max = allCalib_list[len(allCalib_list)-1]+0.2
+if(absTime == True):
+   y_max = allCalib_list[len(allCalib_list)-1]+0.5
 if(ix != "" and iy != "" and iz != ""):
    y_min = allCalib_list[0]-1.
    y_max = allCalib_list[len(allCalib_list)-1]+1.
@@ -340,7 +342,7 @@ else:
 if(absTime == False):
    test.GetYaxis().SetTitle("Average Time [ns]")
 else:
-   test.GetYaxis().SetTitle("Absolute Time [ns]")
+   test.GetYaxis().SetTitle("-(Average DB Hit-Time) [ns]")
 test.GetYaxis().SetLabelFont(42)
 #test.GetYaxis().SetLabelOffset(0.007)
 test.GetYaxis().SetLabelSize(0.05)

@@ -56,12 +56,13 @@ def moveZeros(h2):
 def usage():
     print "Usage: python drawTimingXML.py --tag=[tag] (--runMin=[runMin] --runMax=[runMax])"
     print "Usage: python drawTimingXML.py --payload=[payload]"
+    print "Usage: python drawTimingXML.py --calib=[calib]"
 
 #---------------------------------------------------------- MAIN ----------------------------------------------------------
 def main():
     
  try:
-     opts, args = getopt.getopt(sys.argv[1:], "", ["tag=","payload=","runMin=","runMax=","help"])
+     opts, args = getopt.getopt(sys.argv[1:], "", ["tag=","payload=","calib=","runMin=","runMax=","help"])
 
  except getopt.GetoptError:
      #* print help information and exit:*
@@ -71,6 +72,7 @@ def main():
 
  tag = ""
  payload = ""
+ calib = ""
  runMin = ""
  runMax = ""
  help = False
@@ -81,6 +83,8 @@ def main():
         tag = arg
      if opt in ("--payload"):
         payload = arg
+     if opt in ("--calib"):
+        calib = arg
      if opt in ("--runMin"):
         runMin = arg
      if opt in ("--runMax"):
@@ -92,7 +96,7 @@ def main():
    usage()
    sys.exit(2)
  
- if(tag == "" and payload == ""):
+ if(tag == "" and payload == "" and calib == ""):
    usage()
    sys.exit(2)
 
@@ -104,6 +108,8 @@ def main():
    print "runMax  = ",runMax
  if(payload != ""):
    print "payload = ",payload
+ if(calib != ""):
+   print "calib = ",calib 
 
  gROOT.SetBatch(kTRUE)
 
@@ -163,7 +169,7 @@ def main():
        lines_EErings_split[2] = "0"
     ringMap[(int(lines_EErings_split[0]),int(lines_EErings_split[1]),int(lines_EErings_split[2]))] = int(lines_EErings_split[3])
  
- if(payload !=""):
+ if(payload != "" and calib == "" and tag == ""):
 
     print "---> Dumping the pyload: ",payload 
     command = os.system("conddb dump "+ str(payload) +" > dump_tmp")
@@ -190,7 +196,31 @@ def main():
 
     command = os.system("rm dump_tmp")
    
- elif(payload == "" and tag != ""):
+ elif(payload == "" and calib != "" and tag == ""):
+
+    h2_time_EB = TH2F("h2_TimeMap_EB_abs","",360,0.5,360.5,171,-85.5,85.5)
+    h2_time_EEP = TH2F("h2_TimeMap_EEP_abs","",100,0.5,100.5,100,0.5,100.5)
+    h2_time_EEM = TH2F("h2_TimeMap_EEM_abs","",100,0.5,100.5,100,0.5,100.5)
+    
+    fillMaps(calib,h2_time_EB,h2_time_EEP,h2_time_EEM,pos_EB,pos_EE,ieta_EB,iphi_EB,ix_EE,iy_EE,iz_EE)
+  
+    gStyle.SetPalette(55) #55:raibow palette ; 57: kBird (blue to yellow) ; 107 kVisibleSpectrum ; 77 kDarkRainBow 
+    gStyle.SetNumberContours(100) #default is 20
+
+    gStyle.SetOptStat(0)
+
+    print "Average timing --->",computeMean2D(h2_time_EB),computeMean2D(h2_time_EEM),computeMean2D(h2_time_EEP)
+ 
+    moveZeros(h2_time_EB)
+    drawH2Map(h2_time_EB,"i#phi","i#eta",-5,5,"TimeMap_EB_abs") 
+    moveZeros(h2_time_EEP)
+    drawH2Map(h2_time_EEP,"ix","iy",-7,7,"TimeMap_EEP_abs") 
+    moveZeros(h2_time_EEM)
+    drawH2Map(h2_time_EEM,"ix","iy",-7,7,"TimeMap_EEM_abs") 
+
+    command = os.system("rm dump_tmp")
+    
+ elif(payload == "" and calib == "" and tag != ""):
 
    print "---- Dumping IOVs ----"
 
