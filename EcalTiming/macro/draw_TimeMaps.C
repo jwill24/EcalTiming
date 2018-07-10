@@ -24,16 +24,15 @@ void draw_TimeMaps() {
   gStyle->SetOptStat(0);
   gROOT->SetBatch(kTRUE);
   // inputs
-  TFile* inFile = TFile::Open("/eos/cms/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Commissioning2018/Calibration/314093_314094/ecalTiming.root");
-  
+  TFile* inFile = TFile::Open("/eos/cms/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2018C/Calibration/319349_319437_319439_319444_319449/ecalTiming.root");
   TProfile2D* t2_TimeMap_EB = (TProfile2D*)inFile->Get("TimeMapEB");
-  t2_TimeMap_EB->GetZaxis()->SetRangeUser(-0.3,2.7);
+  t2_TimeMap_EB->GetZaxis()->SetRangeUser(-1,1);
   
   TProfile2D* t2_TimeMap_EEP = (TProfile2D*)inFile->Get("TimeMapEEP");
-  t2_TimeMap_EEP->GetZaxis()->SetRangeUser(-0.3,1.7);
+  t2_TimeMap_EEP->GetZaxis()->SetRangeUser(-3,3);
 
   TProfile2D* t2_TimeMap_EEM = (TProfile2D*)inFile->Get("TimeMapEEM");
-  t2_TimeMap_EEM->GetZaxis()->SetRangeUser(-0.3,1.7);
+  t2_TimeMap_EEM->GetZaxis()->SetRangeUser(-3,3);
 
   TProfile2D* t2_RingTimeMap_EB = (TProfile2D*)inFile->Get("RingTimeMapEB");
   TProfile2D* t2_RingTimeMap_EEP = (TProfile2D*)inFile->Get("RingTimeMapEEP");
@@ -48,11 +47,11 @@ void draw_TimeMaps() {
   TProfile2D* t2_TimeErrorMap_EEM = (TProfile2D*)inFile->Get("TimeErrorMapEEM");
 
   TProfile* t1_BXTime_EB = (TProfile*)((TProfile*)inFile->Get("BXTimeEB"))->Clone("t1_BXTime_EB");
-  t1_BXTime_EB->GetYaxis()->SetRangeUser(-0.1,0.5);
+  t1_BXTime_EB->GetYaxis()->SetRangeUser(-1,1);
 
   TProfile* t1_BXTime_EB_zoomed = (TProfile*)((TProfile*)inFile->Get("BXTimeEB"))->Clone("t1_BXTime_EB_zoomed");
   t1_BXTime_EB_zoomed->GetXaxis()->SetRangeUser(0,500);
-  t1_BXTime_EB_zoomed->GetYaxis()->SetRangeUser(-0.1,0.5);
+  t1_BXTime_EB_zoomed->GetYaxis()->SetRangeUser(-1,1);
 
   TProfile* t1_BXTime_EB_13ADC = (TProfile*)((TProfile*)inFile->Get("BXTimeEB"))->Clone("t1_BXTime_EB_13ADC");
   t1_BXTime_EB_13ADC->SetLineColor(kBlue+1);
@@ -71,10 +70,10 @@ void draw_TimeMaps() {
   t1_BXTime_EB_5GeV->SetMarkerColor(kViolet+1);
   
   TProfile* t1_BXTime_EEP = (TProfile*)inFile->Get("BXTimeEEP");
-  t1_BXTime_EEP->GetYaxis()->SetRangeUser(-0.1,0.5);
+  t1_BXTime_EEP->GetYaxis()->SetRangeUser(-1,1.);
 
   TProfile* t1_BXTime_EEM = (TProfile*)inFile->Get("BXTimeEEM");
-  t1_BXTime_EEM->GetYaxis()->SetRangeUser(-0.1,0.5);
+  t1_BXTime_EEM->GetYaxis()->SetRangeUser(-1.,1.);
 
   TProfile* t1_BXTime_EB_Num = (TProfile*)inFile->Get("BXTimeEB_Num");
   TProfile* t1_BXTime_EEP_Num = (TProfile*)inFile->Get("BXTimeEEP_Num");

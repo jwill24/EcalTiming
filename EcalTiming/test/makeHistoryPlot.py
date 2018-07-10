@@ -388,6 +388,16 @@ line_IOV5_in = TLine(1528243200,float(y_min),1528243200,float(y_max))
 line_IOV5_in.SetLineColor(417)
 line_IOV5_in.SetLineStyle(8)
 line_IOV5_in.SetLineWidth(2)
+
+line_IOV6_in = TLine(1530144000,float(y_min),1530144000,float(y_max))
+line_IOV6_in.SetLineColor(417)
+line_IOV6_in.SetLineStyle(8)
+line_IOV6_in.SetLineWidth(2)
+
+line_IOV7_in = TLine(1531008000,float(y_min),1531008000,float(y_max))
+line_IOV7_in.SetLineColor(417)
+line_IOV7_in.SetLineStyle(8)
+line_IOV7_in.SetLineWidth(2)
   
 c1 = TCanvas("c1","c1",1)
 c1.SetGrid()
@@ -403,6 +413,10 @@ if(runBased == False):
       line_IOV4_in.Draw("same")  
    if(float(timeStamp_begin-0.001e+9)<=1528243200. and float(timeStamp_end+0.001e+9)>=1528243200.):
       line_IOV5_in.Draw("same")  
+   if(float(timeStamp_begin-0.001e+9)<=1530144000. and float(timeStamp_end+0.001e+9)>=1530144000.):
+      line_IOV6_in.Draw("same")  
+   if(float(timeStamp_begin-0.001e+9)<=1531008000. and float(timeStamp_end+0.001e+9)>=1531008000.):
+      line_IOV7_in.Draw("same")  
 if(ix != "" and iy != "" and iz != ""):
    g_EBMinus.Draw("P,same")
 elif(ix == "" and iy == "" and iz == ""):
