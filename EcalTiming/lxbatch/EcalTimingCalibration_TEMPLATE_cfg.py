@@ -11,7 +11,7 @@ process.ioFilesOpt = cms.PSet(
     inputTree = cms.string('/timing/EcalSplashTiming/timingEventsTree'),
 
     ## base output directory: default output/
-    outputDir = cms.string(''),
+    outputDir = cms.string('OUTPUT'),
 
     ## base output: default ecalTiming.dat
     outputCalib = cms.string('ecalTiming.dat'),

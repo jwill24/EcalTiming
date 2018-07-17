@@ -69,6 +69,10 @@ for($index=0;$index<=$#runs;$index++)
 
  $JOBdir = $RUNNumber;
 
+ $command = "rm -rf  /eos/cms/".$OUTPUTSAVEPath."/".$JOBdir."/*.root";
+ print "Removing: /eos/cms/".$OUTPUTSAVEPath."/".$JOBdir."/*.root \n";
+ system ($command) ;
+
  $LISTOFSamples = "fileList.txt";
  $command = "touch ".$LISTOFSamples ;
  system ($command) ;
@@ -168,25 +172,21 @@ for($index=0;$index<=$#runs;$index++)
          
         $command = "setenv X509_USER_PROXY ".$X509_USER_PROXY ;
 	print SAMPLEJOBFILE $command."\n";
-        
-        if($JSONFile eq "0"){
-	   $command = "cmsRun ".$JOBCfgTemplate." files=root://cms-xrd-global.cern.ch/".$file." globaltag=".$GT." output=".$OUTPUTFILEName."_".$jobIt;
-	   print SAMPLEJOBFILE $command."\n";
-        }else{
-           $command = "cmsRun ".$JOBCfgTemplate." files=root://cms-xrd-global.cern.ch/".$file." globaltag=".$GT." jsonFile=".$JSONFile." output=".$OUTPUTFILEName."_".$jobIt;
-	   print SAMPLEJOBFILE $command."\n";
-        }
-        
+
         $command = "eos mkdir ".$OUTPUTSAVEPath."/".$JOBdir;
 	print SAMPLEJOBFILE $command."\n";
+        
+        if($JSONFile eq "0"){
+	   $command = "cmsRun ".$JOBCfgTemplate." files=root://cms-xrd-global.cern.ch/".$file." globaltag=".$GT." output=/eos/cms/".$OUTPUTSAVEPath."/".$JOBdir."/".$OUTPUTFILEName."_".$jobIt.".root";
+	   print SAMPLEJOBFILE $command."\n";
+        }else{
+           $command = "cmsRun ".$JOBCfgTemplate." files=root://cms-xrd-global.cern.ch/".$file." globaltag=".$GT." jsonFile=".$JSONFile." output=/eos/cms/".$OUTPUTSAVEPath."/".$JOBdir."/".$OUTPUTFILEName."_".$jobIt.".root";
+	   print SAMPLEJOBFILE $command."\n";
+        }
 
-	$command = "cp ".$OUTPUTFILEName."_".$jobIt.".root /eos/cms/".$OUTPUTSAVEPath."/".$JOBdir."/";
-	print SAMPLEJOBFILE $command."\n";
+        #$command = "rm -rf  /eos/cms/".$OUTPUTSAVEPath."/".$JOBdir."/*.dat";         
+        #print SAMPLEJOBFILE $command."\n";
 
-        $command = "rm ".$OUTPUTFILEName."_".$jobIt.".root";
-	print SAMPLEJOBFILE $command."\n";
-
-	
 	############
 	# submit job
 	############

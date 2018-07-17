@@ -78,23 +78,30 @@ while (<LISTOFFiles>)
     $JOBLISTOFFiles = $JOBLISTOFFiles."root://eoscms.cern.ch/".$file.",";
 }
 
+
+$OUTDir = $OUTPUTSAVEPath."/".$INPUTRuns;
+$OUTDir =~ s/,/_/g ;
+$OUTFile = "/eos/cms/".$OUTDir."/";
+
 chop $JOBLISTOFFiles;
 
-$tempo1 = "./EcalTimingCalibration_cfg.py" ;   
+$tempo1 = "tempo1" ;   
 system ("cat ".$JOBCfgTemplate." | sed -e s%LISTOFFILES%".$JOBLISTOFFiles."%g > ".$tempo1) ;
 
+$tempo2 = "./EcalTimingCalibration_cfg.py" ;   
+system ("cat ".$tempo1." | sed -e s%OUTPUT%".$OUTFile."%g > ".$tempo2) ;
+
+#$command = "rm ".$tempo1 ;
+#system ($command) ;
 $command = "touch ".$tempBjob ;
 system ($command) ;
 $command = "chmod 777 ".$tempBjob ;
 system ($command) ;
-$command = "cp ".$tempo1." ".$jobDir;
+$command = "cp ".$tempo2." ".$jobDir;
 system ($command) ;
 
 $command = "mkdir ".$jobDir."/output";
 system ($command) ;
-
-$OUTDir = $OUTPUTSAVEPath."/".$INPUTRuns;
-$OUTDir =~ s/,/_/g ;
 
 ######################
 # make job files
@@ -117,23 +124,18 @@ print SAMPLEJOBFILE $command."\n";
 $command = "eval `scramv1 ru -csh`" ;
 print SAMPLEJOBFILE $command."\n";
 
-$command = "EcalTimingCalibration EcalTimingCalibration_cfg.py" ;
-print SAMPLEJOBFILE $command."\n";  
-
 $command = "eos mkdir ".$OUTDir;
-print SAMPLEJOBFILE $command."\n";         
+print SAMPLEJOBFILE $command."\n";      
+
+$command = "EcalTimingCalibration EcalTimingCalibration_cfg.py" ;
+print SAMPLEJOBFILE $command."\n";     
         
-$command = "cd output" ;
-print SAMPLEJOBFILE $command."\n";
+#$command = "cp output/ecalTiming.dat /eos/cms/".$OUTDir."/";
+#print SAMPLEJOBFILE $command."\n";
 
-$command = "cp ecalTiming.dat /eos/cms/".$OUTDir."/";
-print SAMPLEJOBFILE $command."\n";
+#$command = "cp output/ecalTiming-corr.dat /eos/cms/".$OUTDir."/";
+#print SAMPLEJOBFILE $command."\n";
 
-$command = "cp ecalTiming-corr.dat /eos/cms/".$OUTDir."/";
-print SAMPLEJOBFILE $command."\n";
-
-$command = "cp ecalTiming.root /eos/cms/".$OUTDir."/";
-print SAMPLEJOBFILE $command."\n";
 	
 ############
 # submit job
