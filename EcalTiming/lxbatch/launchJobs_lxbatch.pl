@@ -119,7 +119,9 @@ for($index=0;$index<=$#runs;$index++)
 	system ($command) ;
 	$command = "chmod 777 ".$tempBjob ;
 	system ($command) ;
-        $command = "cp  ../test/".$JOBCfgTemplate." ".$jobDir;
+        $command = "cp ".$JOBCfgTemplate." ".$jobDir;
+	system ($command) ;
+        $command = "cp ecalTimingCalibProducer_cfi.py ".$jobDir;
 	system ($command) ;
         if($JSONFile ne "0"){
            $command = "cp  ../".$JSONFile." ".$jobDir;

@@ -46,6 +46,7 @@ EcalTimingCalibProducer::EcalTimingCalibProducer(const edm::ParameterSet& iConfi
         _minRecHitEnergyNStep(iConfig.getParameter<double>("minRecHitEnergyNStep")),
         _energyThresholdOffsetEB(iConfig.getParameter<double>("energyThresholdOffsetEB")),
         _energyThresholdOffsetEE(iConfig.getParameter<double>("energyThresholdOffsetEE")),
+        _ampFrac(iConfig.getParameter<double>("ampFrac")),
         _ampCut_barrelP(iConfig.getParameter<vector<double> >("ampCut_barrelP")),
         _ampCut_barrelM(iConfig.getParameter<vector<double> >("ampCut_barrelM")),
         _ampCut_endcapP(iConfig.getParameter<vector<double> >("ampCut_endcapP")),
@@ -107,8 +108,14 @@ bool EcalTimingCalibProducer::addRecHit(const EcalTimingEvent& timeEvent, EventT
 	     if( timeEvent.energy() < (energyThreshold) ) return false;
            }else{
              float amplitude = (*ebUncalibRechitsCollection->find(timeEvent.detid())).amplitude();
+             float maxOOTAmp = 0.;
+             for(int bx=0;bx<10;bx++)
+                 if((*ebUncalibRechitsCollection->find(timeEvent.detid())).outOfTimeAmplitude(bx) > maxOOTAmp) maxOOTAmp = (*ebUncalibRechitsCollection->find(timeEvent.detid())).outOfTimeAmplitude(bx);
+             //EBDetId hitDetId = timeEvent.detid();
              if(iRing<0 && amplitude<_ampCut_barrelM[abs(iRing)]) return false; 
              if(iRing>0 && amplitude<_ampCut_barrelP[iRing]) return false; 
+             if(amplitude/maxOOTAmp < _ampFrac && maxOOTAmp>0.) return false;
+             //std::cout << "EB: " << hitDetId.ieta() << " " << iRing << " " << _ampCut_barrelM[abs(iRing)] << " " << amplitude << std::endl;
            }
 
         }else{
@@ -118,9 +125,14 @@ bool EcalTimingCalibProducer::addRecHit(const EcalTimingEvent& timeEvent, EventT
 	     if( timeEvent.energy() < (energyThreshold) ) return false;
            }else{
              float amplitude = (*eeUncalibRechitsCollection->find(timeEvent.detid())).amplitude();
+             float maxOOTAmp = 0.;
+             for(int bx=0;bx<10;bx++)
+                 if((*eeUncalibRechitsCollection->find(timeEvent.detid())).outOfTimeAmplitude(bx) > maxOOTAmp) maxOOTAmp = (*eeUncalibRechitsCollection->find(timeEvent.detid())).outOfTimeAmplitude(bx);
              EEDetId hitDetId = timeEvent.detid();
              if(hitDetId.zside()<0 && amplitude<_ampCut_endcapM[iRing]) return false; 
              if(hitDetId.zside()>0 && amplitude<_ampCut_endcapP[iRing]) return false; 
+             if(amplitude/maxOOTAmp < _ampFrac && maxOOTAmp>0.) return false;
+             //std::cout << "EE: " << iRing << " " << _ampCut_endcapM[iRing] << " " << amplitude << std::endl;
            }
 
         }

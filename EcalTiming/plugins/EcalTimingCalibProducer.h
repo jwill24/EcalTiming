@@ -172,6 +172,7 @@ private:
 	double _minRecHitEnergyNStep; ///< number of steps to check energy stability
         double _energyThresholdOffsetEB; ///< energy to add to the minimum energy thresholc
         double _energyThresholdOffsetEE; ///< energy to add to the minimum energy thresholc
+        double _ampFrac; 
         std::vector<double> _ampCut_barrelP; ///< minimum amplitude threshold in EBP
         std::vector<double> _ampCut_barrelM; ///< minimum amplitude threshold in EBM
         std::vector<double> _ampCut_endcapP; ///< minimum amplitude threshold in EEP
