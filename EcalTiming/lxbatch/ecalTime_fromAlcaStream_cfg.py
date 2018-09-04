@@ -31,7 +31,7 @@ options.register('offset',
                  VarParsing.VarParsing.varType.float,
                  "add this to each crystal time")
 options.register('minEnergyEB',
-                 1.5,
+                 2.5,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.float,
                  "add this to minimum energy threshold")

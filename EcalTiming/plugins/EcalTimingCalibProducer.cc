@@ -103,10 +103,10 @@ bool EcalTimingCalibProducer::addRecHit(const EcalTimingEvent& timeEvent, EventT
         int iRing = _ringTools.getRingIndexInSubdet(timeEvent.detid());
         if(timeEvent.detid().subdetId() == EcalBarrel)
         {
-           if(_applyAmpThresEB == false)
+          
+	   if( timeEvent.energy() < (energyThreshold) ) return false;
+           if(_applyAmpThresEB == true)
            {
-	     if( timeEvent.energy() < (energyThreshold) ) return false;
-           }else{
              float amplitude = (*ebUncalibRechitsCollection->find(timeEvent.detid())).amplitude();
              float maxOOTAmp = 0.;
              for(int bx=0;bx<10;bx++)
@@ -120,10 +120,9 @@ bool EcalTimingCalibProducer::addRecHit(const EcalTimingEvent& timeEvent, EventT
 
         }else{
 
-           if(_applyAmpThresEE == false)
+	   if( timeEvent.energy() < (energyThreshold) ) return false;
+           if(_applyAmpThresEE == true)
            {
-	     if( timeEvent.energy() < (energyThreshold) ) return false;
-           }else{
              float amplitude = (*eeUncalibRechitsCollection->find(timeEvent.detid())).amplitude();
              float maxOOTAmp = 0.;
              for(int bx=0;bx<10;bx++)
