@@ -40,9 +40,15 @@ public:
 private:
   virtual bool filter(edm::Event&, const edm::EventSetup&) override;
 
+  //edm::EDGetTokenT<edm::View<pat::TriggerEvent> > triggerEventToken_;
+
 };
 
-  jwk_filter::jwk_filter(const edm::ParameterSet& iConfig){}
+  jwk_filter::jwk_filter(const edm::ParameterSet& iConfig){
+
+    //triggerEventToken_ ( consumes<edm::View<pat::TriggerEvent> > ( iConfig.getParameter<edm::InputTag>( "triggerEvent" ) ) )
+
+}
 
   jwk_filter::~jwk_filter() {}
 
@@ -57,6 +63,7 @@ jwk_filter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   const LHCInfo* info = lhcInformation.product();
 
+  cout << "LHC Fill: " << info->fillNumber() << endl;
   cout << "LHC LS: " << info->lumiSection() << endl;
   cout << "Crossing angle: " << info->crossingAngle() << endl;
   cout << "Beta Star: " << info->betaStar() << endl;
@@ -74,15 +81,16 @@ jwk_filter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
 
-  edm::Wrapper<pat::TriggerEvent> trEv;
-  iEvent.getByLabel( triggerEventLabel_,trEv );
+  //edm::Wrapper<pat::TriggerEvent> trEv;
+  //iEvent.getByLabel( triggerEvent,trEv );
 
-  const TriggerObjectCollection* trig = trEv->getObjects();
+  //const TriggerObjectCollection* trig = trEv->getObjects();
 
-  //int ls = iEvent.luminosityBlock();
-  //int fillNum = trigNames->lhcFill_;
+  int ls = iEvent.luminosityBlock();
+  int fillNum = 6847;  // Fill number from WBM for run number 318669
   
-  //cout << "LS: " << ls << " Fill number: " << fillNum << endl;
+  cout << "LS: " << ls << " Fill number: " << fillNum << endl;
+  cout << " " << endl;
    
   return true;
 }
