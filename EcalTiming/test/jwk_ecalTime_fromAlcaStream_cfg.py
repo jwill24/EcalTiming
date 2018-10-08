@@ -152,6 +152,7 @@ else:
 ## Raw to Digi
 process.load('Configuration/StandardSequences/RawToDigi_Data_cff')
 
+
 ## HLT Filter Splash
 import HLTrigger.HLTfilters.hltHighLevel_cfi
 process.spashesHltFilter = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone(
@@ -181,6 +182,8 @@ process.GlobalTag = cms.ESSource("PoolDBESSource",
 #			),
 #		)
 
+
+#Jack's editions
 process.LHCInfoReader = cms.ESSource("PoolDBESSource",
 		DBParameters = cms.PSet(
 			messageLevel = cms.untracked.int32(0),
@@ -196,11 +199,16 @@ process.LHCInfoReader = cms.ESSource("PoolDBESSource",
 
 process.lhcinfo_prefer = cms.ESPrefer("PoolDBESSource","LHCInfoReader")
 
+
+
 ## Process Digi To Raw Step
 process.digiStep = cms.Sequence(process.ecalDigis  + process.ecalPreshowerDigis)
 
+
+#Jack's edition
 process.load('EventFilter.ScalersRawToDigi.ScalersRawToDigi_cfi')
 process.scalersRawToDigi.scalersInputTag = 'rawDataCollector'
+
 
 
 ## Process Reco
@@ -279,12 +287,17 @@ process.dummyHits = cms.EDProducer("DummyRechitDigis",
                                     endcapDigiCollection   = cms.untracked.string("dummyEndcapDigisPi0"))
 
 ##ADDED
-# TRIGGER RESULTS FILTER                                                                                                                                                                                                                                                                   
+# TRIGGER RESULTS FILTER                                                                                                                                                                                                                                                
+
+#Jack's addition                   
 process.my_filter = cms.EDFilter("jwk_filter",
 	fedRawDataCollectionTag = cms.InputTag('rawDataCollector'),
-	L1AcceptBunchCrossingCollectionTag = cms.InputTag('scalersRawToDigi'))
+	l1AcceptBunchCrossingCollectionTag = cms.InputTag('scalersRawToDigi')
+)
 
-process.my_process = cms.Sequence( process.scalersRawToDigi * process.my_filter )
+process.my_process = cms.Sequence( 
+#process.scalersRawToDigi* 
+process.my_filter )
 
 process.triggerSelectionLoneBunch = cms.EDFilter( "TriggerResultsFilter",
                                                    triggerConditions = cms.vstring('L1_AlwaysTrue'),
@@ -295,6 +308,8 @@ process.triggerSelectionLoneBunch = cms.EDFilter( "TriggerResultsFilter",
                                                    daqPartitions = cms.uint32( 1 ),
                                                    throw = cms.bool( True )
                                                    )
+
+
 
 process.filter=cms.Sequence()
 if(options.isSplash==1):
@@ -345,20 +360,38 @@ process.load("Geometry.EcalMapping.EcalMapping_cfi")
 process.load("Geometry.EcalMapping.EcalMappingRecord_cfi")
 
 
+#Jack's removal
+#process.load('EcalTiming.EcalTiming.RecHitsSelector_cfi')
+
+
 if doAnalysis:
 	process.load('EcalTiming.EcalTiming.ecalTimingCalibProducer_cfi')
+        #Jack's removal
+        #process.timing.recHitEBCollection = cms.InputTag("ecalRecHitEBSelector")
+        #process.timing.recHitEECollection = cms.InputTag("ecalRecHitEESelector")
+        #Jack's edition
 	process.timing.timingCollection = cms.InputTag("EcalTimingEvents")
+
 	process.timing.isSplash= cms.bool(True if options.isSplash else False)
+        #Jack's edition
         process.timing.saveTimingEvents= cms.bool(True)
+
 	process.timing.makeEventPlots=evtPlots
 	process.timing.globalOffset = cms.double(options.offset)
 	process.timing.outputDumpFile = process.TFileService.fileName
 	process.timing.energyThresholdOffsetEB = cms.double(options.minEnergyEB)
 	process.timing.energyThresholdOffsetEE = cms.double(options.minEnergyEE)
 	process.timing.storeEvents = cms.bool(True)
+        #Jack's removal
+        #process.timing.chi2ThresholdOffsetEB = cms.double(options.minChi2EB)
+        #process.timing.chi2ThresholdOffsetEE = cms.double(options.minChi2EE)
+
 	process.analysis = cms.Sequence( process.timing )
 
+#Jack's edition
 process.load('EcalTiming.EcalTiming.EcalTimingSequence_cff')
+
+
 if doReco:
 	process.reco = cms.Sequence( (process.filter 
                       + process.digiStep 
@@ -370,6 +403,7 @@ if doReco:
 process.seq = cms.Sequence()
 if doReco:
 	process.seq += process.reco
+        #Jack's edition
 	process.seq += process.my_process
 if doAnalysis:
 	process.seq += process.analysis

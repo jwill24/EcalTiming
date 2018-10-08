@@ -19,6 +19,8 @@
 <use   name="FWCore/PluginManager"/>
 <use   name="DataFormats/EgammaCandidates"/>
 <use   name="DataFormats/DetId"/>
+<use   name="CondCore/PopCon"/>
+<use   name="DataFormats/PatCandidates"/>
 <use   name="hepmc"/>
 <use   name="root"/>
 <lib   name="Minuit"/>

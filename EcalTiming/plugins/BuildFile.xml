@@ -3,6 +3,7 @@
 <use   name="CommonTools/UtilAlgos"/>
 <use   name="CondFormats/EcalObjects"/>
 <use   name="CondFormats/DataRecord"/>
+<use   name="CondFormats/RunInfo"/>
 <use   name="DataFormats/EcalDetId"/>
 <use   name="Geometry/CaloGeometry"/>
 <use   name="Geometry/EcalMapping"/>
@@ -11,3 +12,6 @@
 <use   name="root"/>
 <use   name="xerces-c"/>
 <use   name="EcalTiming/EcalTiming"/>
+<use   name="CondCore/PopCon"/>
+<use   name="DataFormats/PatCandidates"/>
+

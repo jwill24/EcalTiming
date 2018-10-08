@@ -15,4 +15,7 @@ timing = cms.EDFilter("EcalTimingCalibProducer",
                     produceNewCalib = cms.bool(True),
                     outputDumpFile = cms.string('output.dat'),
                     maxSkewnessForDump = cms.double(2),
+                    #Justin addition
+                    l1AcceptRecordLabel = cms.InputTag("scalersRawToDigi"),
+                    
                     )
