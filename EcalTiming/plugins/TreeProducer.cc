@@ -141,19 +141,33 @@ TreeProducer::analyze( const edm::Event& iEvent, const edm::EventSetup& iSetup )
 
 
   fBunchNum = 0;
-
   std::vector<float> ( info->beam1VC() );
   for (vector<float>::const_iterator i = info->beam1VC().begin(); i != info->beam1VC().end(); ++i) {
     fBeam1VC[fBunchNum] = *i;
     fBunchNum++;
   }
 
-  //cout << " " << endl;
-  fBunchNum = 0;
 
+  fBunchNum = 0;
   std::vector<float> ( info->beam2VC() );
   for (vector<float>::const_iterator i = info->beam2VC().begin(); i != info->beam2VC().end(); ++i) {
     fBeam2VC[fBunchNum] = *i;
+    fBunchNum++;
+  }
+
+  
+  fBunchNum = 0;
+  std::vector<float> ( info->beam1RF() );
+  for (vector<float>::const_iterator i = info->beam1RF().begin(); i != info->beam1RF().end(); ++i) {
+    fBeam1RF[fBunchNum] = *i;
+    fBunchNum++;
+  }
+
+
+  fBunchNum = 0;
+  std::vector<float> ( info->beam2RF() );
+  for (vector<float>::const_iterator i = info->beam2RF().begin(); i != info->beam2RF().end(); ++i) {
+    fBeam2RF[fBunchNum] = *i;
     fBunchNum++;
   }
 
@@ -176,10 +190,17 @@ TreeProducer::beginJob()
   tree_->Branch( "event_number", &fEventNum, "event_number/l");
 
   tree_->Branch( "crossing_angle", &fXangle, "crossing_angle/i");
+  tree_->Branch( "beta_star", &fBetaStar, "beta_star/F");
+  tree_->Branch( "bunch1", &fBunch1, "bunch1/i");
+  tree_->Branch( "bunch2", &fBunch2, "bunch2/i");
+  tree_->Branch( "collision_bunches", &fCollBunch, "collision_bunches/i");
+  tree_->Branch( "target_bunches", &fTarBunch, "target_bunches/i");
 
   tree_->Branch( "num_bunch", &fBunchNum, "num_bunch/i");
   tree_->Branch( "beam1_VC", fBeam1VC, "beam1_VC[num_bunch]/F");
   tree_->Branch( "beam2_VC", fBeam2VC, "beam2_VC[num_bunch]/F");
+  tree_->Branch( "beam1_RF", fBeam1RF, "beam1_RF[num_bunch]/F");
+  tree_->Branch( "beam2_RF", fBeam2RF, "beam2_RF[num_bunch]/F");
   tree_->Branch( "beam_delay", fBeamDelay, "beam_delay[num_bunch]/F");
   
 
