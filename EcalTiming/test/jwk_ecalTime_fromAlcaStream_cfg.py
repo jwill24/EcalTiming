@@ -290,14 +290,16 @@ process.dummyHits = cms.EDProducer("DummyRechitDigis",
 # TRIGGER RESULTS FILTER                                                                                                                                                                                                                                                
 
 #Jack's addition                   
-process.my_filter = cms.EDFilter("jwk_filter",
+process.load('EcalTiming.EcalTiming.TreeProducer_cfi')
+
+process.my_analyzer = cms.EDAnalyzer("TreeProducer",
+        outputFilename = cms.string('output.root'),
 	fedRawDataCollectionTag = cms.InputTag('rawDataCollector'),
 	l1AcceptBunchCrossingCollectionTag = cms.InputTag('scalersRawToDigi')
 )
 
 process.my_process = cms.Sequence( 
-#process.scalersRawToDigi* 
-process.my_filter )
+process.my_analyzer )
 
 process.triggerSelectionLoneBunch = cms.EDFilter( "TriggerResultsFilter",
                                                    triggerConditions = cms.vstring('L1_AlwaysTrue'),
@@ -409,6 +411,8 @@ if doAnalysis:
 	process.seq += process.analysis
 else:
 	process.endp = cms.EndPath(process.RECOoutput)
+
+
 
 process.p = cms.Path(process.seq)
 #process.p = cms.Path(process.my_insert)
